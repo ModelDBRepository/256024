@@ -3,6 +3,12 @@
 // 
 // RBD 2019
 
+showGUI = 0
+// system("pwd")
+// system("ls ../*.hoc")
+load_file("../initLGMD.hoc")
+showGUI = 1
+
 if (issplit()==1) stopPar()
 cvode_active(1)
 

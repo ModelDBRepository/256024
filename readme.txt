@@ -28,3 +28,5 @@ load_file("RallMod.hoc")	# run the Rall model
 
 
 
+20190808 dropbox update from Richard Dewell and additional touchups to
+make fig 8 button work (from mosinit.hoc)

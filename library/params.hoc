@@ -37,7 +37,7 @@ forall nSection+=1
 
 
 // ---- Global strdef (there are no local strdefs in nrn)
-strdef NRNDIR				// NRNDIR is base directory of model
+// strdef NRNDIR				// NRNDIR is base directory of model
 strdef DATADIR, datadir_	// DATADIR is full path of directory where simulation data is saved
 strdef subdir				// data subdirectory
 strdef strtmp, tmpstr		// tmp strings used by several procs & funcs (there are no local strdef in hoc)
@@ -75,10 +75,10 @@ Gstep = 5					// How many time steps between measuring conductances
 
 // ***** Setup input and output directory paths *****
 
-system("echo $NRNBASE", NRNDIR)	// retrieve path of local neuron simulation directory
 StrFx = new StringFunctions()
-strlen = StrFx.len(NRNDIR)
-StrFx.left(NRNDIR,strlen-1)		// remove newline character at end of string
+// system("echo $NRNBASE", NRNDIR)	// retrieve path of local neuron simulation directory
+// strlen = StrFx.len(NRNDIR)
+// StrFx.left(NRNDIR,strlen-1)		// remove newline character at end of string
 
 strtmp="date \"+%m%d%Y\" "
 system(strtmp,tmpstr)			// get current date

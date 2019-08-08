@@ -96,13 +96,15 @@ gvec_G_ = new List()
 
 // ***** Setup input and output directory paths *****
 
-system("echo $NRNBASE", NRNDIR)	// retrieve path of local neuron simulation directory
-StrFx = new StringFunctions()
-strlen = StrFx.len(NRNDIR)
-StrFx.left(NRNDIR,strlen-1)		// remove newline character at end of string
-
+// system("echo $NRNBASE", NRNDIR)	// retrieve path of local neuron simulation directory
+// StrFx = new StringFunctions()
+// strlen = StrFx.len(NRNDIR)
+// StrFx.left(NRNDIR,strlen-1)		// remove newline character at end of string
+NRNDIR = getcwd()
+NRNDIR = "."
 strtmp="date \"+%m%d%Y\" "
 system(strtmp,tmpstr)			// get current date
+StrFx = new StringFunctions()
 strlen = StrFx.len(tmpstr)
 StrFx.left(tmpstr,strlen-1)	// remove newline character at end of string
 
@@ -110,7 +112,7 @@ StrFx.left(tmpstr,strlen-1)	// remove newline character at end of string
 // make directory to save data
 datadir_ = "data/"				// data directory is named "data"
 sprint( DATADIR, "%s/%s%s", NRNDIR, datadir_, tmpstr )
-sprint(strtmp, "mkdir %s", DATADIR)
+sprint(strtmp, "mkdir -p %s", DATADIR)
 system(strtmp)
 
 sprint( syndir, "%s/synapse", NRNDIR )

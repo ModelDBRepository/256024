@@ -5,25 +5,25 @@ axial = 350	// axial resistance (Ohm-cm)
 
 // LGMD morphology
 load_file("morphologies/04_06_15_LGMDreconstruction_NEURON.hoc")
-WeightedMeanTransferImpedance("LGMD_full")
 PassiveImpedances( "LGMD", "", Gm, axial, Cm, 0)
+WeightedMeanTransferImpedance("LGMD_full", "", 0, Gm, axial, Cm)
 
 
 ReplaceMorphology("morphologies/purkinje.hoc")
-WeightedMeanTransferImpedance("purkinje_full", "", 0, Gm, axial, Cm)
 PassiveImpedances( "Purkinje", "", Gm, axial, Cm, 0)
+WeightedMeanTransferImpedance("purkinje_full", "", 0, Gm, axial, Cm)
 
 
 ReplaceMorphology("morphologies/CA1_pyramidal2.hoc")
-WeightedMeanTransferImpedance("CA1Pyramidal_full", "", 0, Gm, axial, Cm)
 PassiveImpedances( "CA1Pyramidal", "", Gm, axial, Cm, 0)
+WeightedMeanTransferImpedance("CA1Pyramidal_full", "", 0, Gm, axial, Cm)
 
 
 ReplaceMorphology("morphologies/HL23_pyramidal.hoc")
-WeightedMeanTransferImpedance("HL23Pyramidal_full", "", 0, Gm, axial, Cm)
 PassiveImpedances( "HL23Pyramidal", "", Gm, axial, Cm, 0)
+WeightedMeanTransferImpedance("HL23Pyramidal_full", "", 0, Gm, axial, Cm)
 
 
 ReplaceMorphology("morphologies/OLM.hoc")
-WeightedMeanTransferImpedance("OLM2_full", "", 0, Gm, axial, Cm)
 PassiveImpedances( "OLM", "", Gm, axial, Cm, 0)
+WeightedMeanTransferImpedance("OLM2_full", "", 0, Gm, axial, Cm)

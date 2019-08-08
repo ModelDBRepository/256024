@@ -3,7 +3,7 @@
 load_file("morphologies/04_06_15_LGMDreconstruction_NEURON.hoc")
 load_file("LGMD/LGMDparams.hoc")
 
-load_file("parinit.hoc")
+load_file("./library/parinit.hoc")
 
 if (msplit) {
  	startPar()
