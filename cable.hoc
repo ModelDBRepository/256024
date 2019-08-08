@@ -1,0 +1,106 @@
+
+objref modname
+modname = new String()
+modname.s = "cable"
+
+
+N=100
+create Cable[N]
+access Cable[0]
+
+pt3dclear()
+
+for n=0,N-1 {
+	Cable[n] {
+		nseg=5
+		cm=0.8
+		L = 5
+		diam=10
+		if (n<(N-1)) connect Cable[n+1](0),1
+	}
+}
+
+define_shape()
+
+// forall L=10
+//forall cm=0.8
+// forall diam=5 
+Cm=0.8
+axial = 350
+
+proc runImp() {
+	sprint(modname.s,"%s_%gum_%gum_%g", $s1, L*N, diam, axial)
+	WeightedMeanTransferImpedance(modname.s, "", 0, 1e-4, axial, Cm)
+	PassiveImpedances( modname.s, "", 1e-4, axial, Cm, 0)
+}
+
+proc taperdiam() {local inc
+// taperdiam(max diam, min diam)
+	inc = ($1-$2)/(N-1)
+	for n=0,N-1 {
+		Cable[n].diam=$1-inc*n
+	}
+}
+
+proc randdiam() {localobj rd
+// randdiam(min diam, max diam)
+
+	use_mcell_ran4()
+	lowindex = mcell_ran4_init()
+	rd = new Random()
+	rd.uniform($1,$2)
+	rd.MCellRan4(248)
+	
+	inc = ($1-$2)/(N-1)
+	for n=0,N-1 {
+		Cable[n].diam = rd.repick()
+	}
+}
+
+proc pinchdiam() {local np
+	forall diam=10
+	np = $1
+	for n=0,np-1 {
+		i = n*100/np
+		Cable[i].diam=0.5
+	}
+}
+
+
+proc CableSims() {
+	runImp("cable")
+
+// 	forall diam=5
+// 	runImp("cable")
+
+	forall diam=20
+	runImp("cable")
+
+	forall diam=2
+	runImp("cable")
+
+	taperdiam(50,0.5)
+	runImp("cable")
+
+	randdiam(0.5,39.5)
+	runImp("cable")
+
+	pinchdiam(10)
+	runImp("cable")
+	
+	// axial = 35
+	// runImp()
+	// 
+	// forall diam=10
+	// runImp()
+	// 
+	// forall diam=5
+	// runImp()
+}
+
+CableSims()
+
+// WeightedMeanTransferImpedance("cable_10-05um_350", "", 0, 1e-4, 350, 0.8)
+// PassiveImpedances( "cable_10-05um_350", "", 1e-4, 350, 0.8, 0)
+
+

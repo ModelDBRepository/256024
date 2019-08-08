@@ -1,0 +1,62 @@
+
+// proc StartPar( void )	-	starts multisplit
+	// dependency: ParallelComputeTool (template in parcom.hoc)
+
+// proc SopPar( void )		-	stops multisplit
+	// dependency: ParallelComputeTool (template in parcom.hoc)
+
+// func issplit( void )		-	returns 1 if multisplit is on, 0 if not
+	// dependency: ParallelComputeTool (template in parcom.hoc)
+
+
+
+// parcom.hoc is nrn library file with class definition for ParallelComputeTool.
+load_file("parcom.hoc")	
+
+
+objectvar pc_	// declaration for new ParallelComputeTool object
+//Begin ParallelComputeTool[0]
+
+pc_ = ParallelComputeTool[0]
+pc_.pthread(0)
+
+if (name_declared("nmt") == 0) {	//Should be set in Global Paramters
+	nmt = 8							// nmt = number of threads to use.
+}
+
+proc startPar() {
+// procedure to turn on multisplit and set number of threads
+	pc_.nthread(nmt)
+	pc_.pthread(1)
+	pc_.multisplit(1)
+}
+
+proc stopPar() {
+// procedure to turn off multisplit and reset number of threads to 1
+	nmt = pc_.nthread_
+	pc_.nthread(1)
+	pc_.pthread(0)
+	pc_.multisplit(0)
+	//issplit=0
+}
+
+func issplit() {
+// there is no public field or method to get the multisplit state so instead I check the "cache"
+// field which has the same value as the multisplit toggle in every instance that I've encountered
+	
+	/*
+	object_push(pc_)
+	multisplit_
+	object_pop()
+	*/
+	return pc_.cache()
+	
+}
+
+if (showGUI) {
+// open the gui window for the parallel computing tool
+	pc_.map("ParallelComputeTool[0]", 399, 8, 210.24, 248.64)
+}
+
+//End ParallelComputeTool[0]
+

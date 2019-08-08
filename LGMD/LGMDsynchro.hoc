@@ -1,0 +1,259 @@
+// simulations testing LGMD discrimination of synaptic input synchrony
+//  adapted from Migliore et. al 2004 (ModelDB: number 32992)
+// 
+// RBD 2019
+
+if (issplit()==1) stopPar()
+cvode_active(1)
+
+objref model
+model = new String()
+model.s = "LGMD"
+
+strdef label
+synint=50	// synaptic interval (ms)
+reps = 1	// number of times to repeat
+ii = 0		// current rep
+nsyn =200	// number of synapses
+weight=2.6	// synaptic weight (nS)
+gh = 1		// whether dendrites have Gh
+
+rngseed=764	// random gen seed
+nfrac = 1	// noise fraction of synapse timing (1 is random, 0 is synchronous)
+nfd = 8		// number of noise levels (plus 1 no noise)
+Zstate = 0	// electrotonic state (0 = normal conductances; 1 = replaced by inductive leak)
+SaveZ = 0	// whether to save impedance properties
+SaveP = 0	// whether to save model properties
+Zall = 1	// whether to measure impedance of all sections (1), or just potenital input sites (0)
+tstop=200	// end time of simulation (ms)
+
+eZD=0.999	// effectiveness of HCN block (1=complete block)
+eXE=0.999	// effectiveness of M block (1=complete block)
+
+nTines = 0
+forsec "Tines" nTines+=1
+
+objref nc[nsyn], g, spkrec,timevec, rsyn[nsyn], s[nsyn], rc, rd
+
+use_mcell_ran4()
+lowindex = mcell_ran4_init()
+rc = new Random()
+rc.uniform(0,nTines-1)
+
+timevec = new Vector()
+spkrec = new NetCon(&v(0.5), nil)
+spkrec.record("spkproc()")
+
+
+proc spkproc() {
+	stoprun = 1
+	timevec.append(t,gh,Zstate,nfrac*synint,rngseed,ii)
+	continuerun(t+1e-6)
+}
+
+for i=0, nsyn-1 {
+	rsyn[i] = new Exp2Syn(0.5)
+	rsyn[i].e=0
+	rsyn[i].tau1 = 0.3
+	rsyn[i].tau2 = 3
+}
+
+proc setsyntime() {
+	for i=0, nsyn-1 {
+		s[i] = new NetStim(0.5)
+		s[i].interval=synint// mean time between inputs
+		s[i].number = 1		// mean number of inputs (at each location)
+		s[i].start = 20		// time of first input
+		s[i].noise=nfrac		// randomness of timing (0 is synchronous, 1 is jitter=interval)
+		s[i].seed(rngseed+3)	// seed for rng
+		nc[i] = new NetCon(s[i],rsyn[i],0,0,weight*1e-3)
+// 		nc = new NetCon(source, target (pnt), threshold (mV), delay (ms), weight)
+	}
+}
+
+proc setsynloc() {
+
+	rc.MCellRan4(rngseed+1)
+	for i=0, nsyn-1 {
+		comp=int(rc.repick())
+		Tines[comp] { rsyn[i].loc(0.5) }
+	}
+}
+
+g = new Graph(0)
+if (showGUI) {
+	graphList[0].append(g)
+	{g.view(0, -70, tstop, 70, 400, 400, 800, 350)}
+	g.addvar("v(0.5)",1,1)
+	g.begin()
+	g.family(1)
+}
+proc runsynchro() {local n	localobj fobj, gpasvec, lpasvec, gls
+
+	gls = new List()
+	gls.append( new String("h") )
+	gls.append( new String("M") )
+	gls.append( new String("pas") )
+
+	gpasvec = new Vector( nSection )
+	lpasvec = new Vector( nSection )
+
+	finitialize(v_init)
+	n=0
+	forall {
+		gpasvec.x[n] = Rm( "pas", 1 )
+		lpasvec.x[n] = Rm( gls, 1 )
+		n+=1
+	}
+
+	for ii=1,reps {
+// 	full model
+		gh=1
+		Zstate=0
+		g.color(4)
+		if (ii>1) {
+			n=0
+			forall {
+				if (ismembrane("pas")) {
+					g_pas = gpasvec.x[n]
+				}
+				n+=1
+			}
+		}
+		label = "full_model"
+		g.label(0.65,0.8,label)
+		runc()
+		
+// 	no Ih
+// 		gh=0
+// 		addZD7288()
+// 		Zstate=0
+// 		g.color(3)
+// 		label = "ZD7288"
+// 		g.label(0.65,0.75,label)
+// 		runc()
+// 		washZD7288()
+// 		
+// 	no IM
+// 		gh=2
+// 		addXE991("axon")
+// 		g.color(2)
+// 		label = "XE991"
+// 		g.label(0.65,0.7,label)
+// 		runc()
+// 		washXE991("axon")
+		
+// 	no Ih or IM
+		gh=3
+		addXE991("axon")
+		addZD7288()
+		g.color(1)
+		label = "ZD7288_XE991"
+		g.label(0.65,0.65,label)
+		runc()
+		washXE991("axon")
+ 		washZD7288()
+		
+// 	Ih and IM replaced by inductive leak
+		gh=3
+		Zstate=1
+		n=0
+		forall {
+			if ( (ismembrane("h")) || (ismembrane("M")) ) {
+				insert Lpas2
+				uninsert pas
+				e_Lpas2=-64.2
+				pl_Lpas2 = 0.95
+				L_Lpas2 = 200
+				g0_Lpas2 = lpasvec.x[n]
+				n+=1
+			}
+		}
+		addXE991()
+		addZD7288()
+		g.color(5)
+		label = "Lpas2"
+		g.label(0.65,0.6,label)
+		runc()
+		
+// 	Ih and IM replaced by leak
+		n=0
+		forall {
+			if (ismembrane("Lpas2")) {
+				insert pas
+				uninsert Lpas2
+				g_pas = lpasvec.x[n]
+			}
+			n+=1
+		}
+		
+		gh=4
+		Zstate=0
+		g.color(2)
+		label = "gpas"
+		g.label(0.65,0.7,label)
+		runc()
+		washXE991()
+		washZD7288()
+		
+		rngseed+=4
+	}
+	
+	nspkval = timevec.size()
+	sprint( datafile, "%s/%s_synchro_spks_%g_%g", DATADIR, model.s, rngseed,reps)
+	fobj = new File()
+	fobj.wopen(datafile)
+	fobj.printf("Data is spike time, g state, Z state, noise tau (ms), rng seed, rep\n")
+	fobj.printf("%g spikes recorded\n", nspkval/6)
+	fobj.printf("%g values\n", nspkval)
+	n = timevec.printf(fobj, "%-1.8g\t")
+	fobj.close()
+	
+}
+
+proc runc() { local n,i
+
+	setsynloc()
+
+	finitialize(v_init)
+	forall {
+		tmp = v_init
+		if (ismembrane("pas")) {
+			if (ismembrane("na_ion")) {	tmp = tmp+ina/g_pas }
+			if (ismembrane("h")) {	tmp = tmp+i_h/g_pas }
+			if (ismembrane("ca_ion")) {	tmp = tmp+ica/g_pas }
+			if (ismembrane("k_ion")) {	tmp = tmp+ik/g_pas }
+			e_pas = tmp
+		} else {
+// 			if (ismembrane("na_ion")) {	tmp = tmp+ina/g_Lpas2 }
+// 			if (ismembrane("h")) {	tmp = tmp+i_h/g_Lpas2 }
+// 			if (ismembrane("ca_ion")) {	tmp = tmp+ica/g_Lpas2 }
+// 			if (ismembrane("k_ion")) {	tmp = tmp+ik/g_Lpas2 }
+// 			e_Lpas2 = tmp
+		}
+	}
+
+	for n=0,nfd {
+		nfrac = 1.0/nfd*n
+		setsyntime()
+		
+		run()
+	}
+	
+	if ( (ii==1) && (SaveP==1) ) {
+		if (SaveZ==1) {
+			sprint(label, "LGMD_Z_%s", label)
+			if (Zall) {
+				SaveImpedanceProfile( label, "", 50, 0, 0.2, 1, 1)
+			} else {
+				SaveImpedanceProfile( label, distlist, 50, 0, 0.2, 1, 1)
+			}
+		} else {
+			sprint(strtmp, "%s/%s_%s", DATADIR, model.s, label)
+			SaveParams( strtmp )
+		}
+	}
+}
+
+runsynchro()
+

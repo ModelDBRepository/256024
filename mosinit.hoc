@@ -1,0 +1,32 @@
+//moddir mods
+
+// load_file("nrngui.hoc")
+// load_file("mview.hoc")
+load_file("libinit.hoc")
+
+xpanel("Dewell & Gabbiani 2019 J Neurophysiol")
+  xlabel("See the readme for more info")
+
+  xlabel("Choose a simulation and then quit and restart to try another")
+// For simulations measuring synaptic timing discrimination shown in figure 8:
+  xlabel("** Synaptic timing discrimination **")
+  xbutton("Figure 8","{load_file(\"LGMD/LGMDsynchro.hoc\")}")
+
+// For realistic morphology simulations shown in figure 6:
+  xlabel("** Compare Realistic Mophologies **")
+  xbutton("PassiveMorphologies.hoc","{load_file(\"PassiveMorphologies.hoc\")}")
+
+// For simulations on simplified morphology models shown in figure 7:
+  xlabel("** Simplified Morphologies **")
+  xbutton("Figure 7","{load_file(\"cable.hoc\")}")
+  
+// For simulations resulting in figure S3:
+  xlabel("** Rall model **")
+  xbutton("RallMod.hoc", "{load_file(\"RallMod.hoc\")}")
+
+  xlabel(" ")
+  xbutton("Quit","quit()")
+xpanel()
+
+
+// ChirpSet( filename, chirp obj, section list, dcs, dt, amp)

@@ -1,0 +1,78 @@
+
+{
+load_file("stdlib.hoc")
+load_file("stdrun.hoc")
+}
+
+
+/* --- Initialize Global NEURON Settings --- */
+
+secondorder=2			// sets the time integration method
+v_init = -65			// initial membrane potential
+steps_per_ms = 10		// number of points to plot per ms
+dt = 0.02				// time step of simulations (in ms)	(must be compatible with steps_per_ms)
+t = 0					// Neuron time (ms)
+tstop=500				// time (ms) that simulation stops
+realtime = 0			// real world time since simulation start (s)
+screen_update_invl= 0.1	// how often to update plots
+/* --- End Global NEURON Settings --- */
+
+
+/* --- Initialize Global variables for simulations --- */
+verbosity = 2		// scalar. verbosity level (0-6). Sets how much to print to command line
+if (verbosity > 2) printf("Verbosity level is %g \n", verbosity)
+showGUI = 1		// boolean. whether to run "initgui.hoc" to open gui
+msplit = 1		// boolean. whether to start multisplit parallel context
+nmt = 8			// integer. number of threads to run if split (change based on system)
+MDB = 0			// boolean. whether to load the modelDB version (accession # 195666)
+LoadDependents = 0	//boolean.  unused for now (in future will test for func dependencies)
+/* --- End Global simulation variables --- */
+
+
+load_file("stdutil.hoc")		// general utility procs and funcs (all model independent)
+
+/* --- load model specific morphology--- */
+//load_file("04_06_15_LGMDreconstruction_NEURON.hoc")	// Import the reconstruction, set morphology
+/* ---- */
+
+load_file("mview.hoc")			 	// load modelview library
+
+/* --- load model specific parameters--- */
+if (MDB==1) { load_file("LGMDparams_modelDB.hoc")
+} else load_file("LGMDparams.hoc")			// setup global variables and parameters for simulations
+/* ---- */
+
+load_file("parinit.hoc")		 	// Setup multisplit
+
+load_file("MorphologyUtilities.hoc")		// Procs and funcs related to morphology
+
+load_file("MembraneUtilities.hoc")	// Procs and funcs related to membrane conductances
+
+load_file("SimulationUtilities.hoc")	// Procs and funcs related simulations (i.e SaveData())
+SaveSections(0)
+load_file("CurrentInjections.hoc")	// current injection simulation procedures
+// load_file("VisualSimulations.hoc")	// visual response simulation procedures
+//load_file("AllUtilities.hoc")		// load many procs & funcs used in simulations
+if (verbosity > 2) printf("Utility functions loaded \n")
+
+/* --- Set model specific membrane parameters--- */
+// if (passive < 2) {
+// 	load_file("LGMD_membrane.hoc")		// set membrane properties for each section
+// } else if (passive == 2) {
+// 	load_file("LGMD_membrane_passive_dendrites.hoc")		// set membrane properties for each section
+// } else if (passive == 3) {
+// 	load_file("LGMD_membrane_hcn_only.hoc")		// set membrane properties for each section
+// } else if (passive == 4) {
+// 	load_file("LGMD_membrane_no_Ca.hoc")		// set membrane properties for each section
+// } else if (passive == 5) {
+// 	load_file("LGMD_membrane_modelDB.hoc")		// set membrane properties for each section
+// }
+/* ---- */
+
+if (showGUI) {
+	load_file("initgui.hoc")
+}
+
+if (msplit) {
+	startPar()
+}

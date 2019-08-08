@@ -1,0 +1,651 @@
+
+//objref Istim
+//strdef filename, savename, datadir
+//strdef strtmp, datestr, cmd
+//objref Str
+//strdef cwd
+
+//min_dc_step = -4
+//max_dc_step = 2
+//dc_incr = 2
+//dcs = [-4,-2,0,2]
+//stepincr = 2
+
+//dcs = new Vector()
+//dcs.label("nA")
+//dcs.indgen(minstep,maxstep,stepincr)
+
+//InjectChirp(1, 0.1, 0.24, tstart, 2, 20000, 0, 100, 22000)
+//{ }
+
+//
+// SumPulse(amp, count, delay, start, dc, dc_start, dc_end)
+// InjectChirp(amp, f0, bta, start, chirptype, duration, dc, dc_start, dc_end)
+//
+// current injection procedures
+//
+//
+
+//objref idc[1], sp[1]
+
+proc SumPulse() {local n, amp, count, delay, start, dc, dc_t1, dc_t2
+//SumPulse( amp, count, delay, start, dc, dc start, dc end)
+//e.g. Tines[786] { SumPulse( 3, 5, 10, 250, -3, 100, 400) }
+
+	n = numarg()		// get number of input arguments
+
+	amp		= $1		// amplitude of sEPSP (nA)
+	count	= $2		// number sEPSP
+	if (count < 1) {	// check that count is positive number to prevent error by "objref sp[count]" below
+		return
+	}
+	delay	= $3		// delay between sEPSP (ms)
+	start	= $4		// time to start sEPSP (ms)
+	if(n > 5) {
+		dc		= $5	// offset current level (nA)
+		dc_t1 	= $6	// start time of holding current (ms)
+		dc_t2	= $7	// end holding current (ms)
+	} else {
+		dc = 0			// default is to not inject a holding current (0 nA)
+	}
+	
+	idc_G_[0] = new IClamp(0.5)
+	idc_G_[0].amp = dc
+	if (dc != 0) {
+		idc_G_[0].dur = dc_t2 - dc_t1
+		idc_G_[0].del = dc_t1
+	}
+	
+	objref sp_G_[count]
+	for (i=0; i<count; i=i+1) {
+		sp_G_[i] = new sEPSP(0.5)     // sEPSP waveform (defined in sEPSP.mod)
+		sp_G_[i].A	= amp
+		sp_G_[i].onset= start+delay*i
+	}
+	
+} // end SumPulses()
+
+
+proc InjectChirp() {local dc, dc_t1, dc_t2
+//InjectChirp(amp, init_freq, beta, chirp start, chirp type, duration, dc, dc start, dc end)
+//e.g. Tines[786] { InjectChirp(1, 0, 1, 250, 1, 1000, -3, 100, 1400) }
+// Tines[786] { InjectChirp(1, 0.05, 0.24, 500, 2, 20000, 0 ) }
+
+	if ($1 == 0) {
+		return
+	}
+
+	cw_G_ = new chirp(0.5)  // chirp waveform (defined in chirp.mod)
+	cw_G_.amp	= $1		// amplitude of the chirp (nA)
+	cw_G_.Finit	= $2		// initial frequency of the chirp (/s)
+	cw_G_.beta	= $3		// rate of frequency change	(/s/s)
+	cw_G_.t1	= $4		// start time of the chirp stimulation (ms)
+	cw_G_.ctype	= $5		// type of chirp
+	cw_G_.dur	= $6		// duration of chirp (ms)
+
+	if (numarg() > 7) {
+		dc		= $7	// offset level (nA)
+		dc_t1 	= $8	// start of holding current (ms)
+		dc_t2	= $9	// end holding current (ms)
+	} else {
+		dc = 0
+	}
+	
+	idc_G_[0] = new IClamp(0.5)
+	idc_G_[0].amp = dc
+	if (dc != 0) {
+		idc_G_[0].dur = dc_t2 - dc_t1
+		idc_G_[0].del = dc_t1
+	}
+
+} // end InjectChirp()
+
+
+/* --- Designate recording vectors for each location and time  --- */
+
+proc StepStim() { local i,j, n, count, ims, tmp, tmp2		localobj amp, Istim, sl
+// StepStim( datafile, amp, section list, tstop, pdur)
+// StepStim( "Rin", -2)
+
+	tmp = dt		// store dt value to reset at end
+	tmp2 = steps_per_ms
+	steps_per_ms = 2
+	dt = 0.025
+	
+	tstart = 300
+// 	tstop = 1500
+// 	pdur = 1000
+
+	n = numarg()
+
+	if (n > 4) {
+		pdur = $5
+	} else pdur = 1000
+	
+	if (n > 3) {
+		tstop = $4
+	} else tstop = tstart+pdur+250
+
+	seclist = 4
+	SaveSections(4)
+	
+	subdir = "sags"
+	
+	sprint(strtmp,"mkdir %s/%s", DATADIR, subdir)
+	system(strtmp)
+
+	datafile = $s1
+	if (argtype(2)==0) {
+		amp = new Vector(1)
+		amp.x[0]=$2
+	} else if (argtype(2)==1) {
+		amp=$o2
+	}
+	if (n>=3) if (argtype(3)==1) {
+		sl = $o3
+	}
+	if (object_id(sl,1) == -1)	sl = simsecs_G_
+	
+	count = SectionListCount(sl)
+
+	objref rvec_G_[count]
+	objref objtmp[count]
+	i=0
+	forsec sl {
+		objtmp[i] = new IClamp(0.5)
+		rvec_G_[i] = new Vector()
+		rvec_G_[i].record(objtmp[i], &v(0.5), RecDt)
+		rvec_G_[i].label(secname())
+		i=i+1
+	}
+
+	if (verbosity > 0) printf("saving param file ... \n")
+
+	sprint(strtmp, "%s/%s/%s_prm.txt", DATADIR, subdir, datafile )
+	SaveParams( strtmp )
+
+	if (verbosity > 0) printf("running simulation ... \n")
+	
+	Istim = new IClamp(0.5)
+	Istim.del = tstart
+	Istim.dur = pdur
+
+	i=0
+	forsec sl {
+	//for (i=0; i<count; i=i+1) {
+	
+		for (j=0; j<amp.size(); j=j+1) {
+		
+			Istim.loc(0.5)		// move current clamp to cas
+			ivec_G_.record(Istim, &Istim.i, RecDt)
+
+			Istim.amp = amp.x[j] // set amplitude of current step (nA)
+
+			finitialize(v_init)
+			run()
+
+// 			sprint( filename, "%s%s%s/%s_%s_%g", basepath, datadir, datestr, datafile, secname(),amp.x[j] )
+			sprint( filename, "%s/%s/%s_%s_%g", DATADIR, subdir, datafile, secname(), amp.x[j] )
+
+			sprint( headerstr, "Step simulation\ntstart=%g\tpdur=%g\nAmp: %g\n",tstart,pdur,amp.x(j) )
+			if (verbosity > 3) printf("%s\n", headerstr)
+
+			SaveData( filename, headerstr, count, 1, 1 )
+
+			if (verbosity > 3) printf("Step finished\n")
+		}
+		i+=1
+		if (verbosity > 1) printf("finished sags for %g of %g locations\n", i, count)
+	}
+	
+	dt = tmp
+	steps_per_ms = tmp2
+
+}
+
+/*
+proc VCStep() { local i,j, n, count, ims, tmp, tmp2		localobj amp, Vstim, sl
+// StepStim( datafile, amp, section list, tstop)
+
+	tmp = dt		// store dt value to reset at end
+	tmp2 = steps_per_ms
+	steps_per_ms = 2
+	dt = 0.05
+	
+	tstart = 400
+	tstop = 2000
+	pdur = 1500
+
+//     clampobj = new SEClamp(0.5)
+//     dur1 dur2 dur3 -- ms
+//     amp1 amp2 amp3 -- mV
+//     rs -- MOhm
+
+	subdir = "VCstep"
+	
+	sprint(strtmp,"mkdir %s/%s", DATADIR, subdir)
+	system(strtmp)
+
+	n = numarg()
+	datafile = $s1
+	if (argtype(2)==0) {
+		amp = new Vector(1)
+		amp.x[0]=$2
+	} else if (argtype(2)==1) {
+		amp=$o2
+	}
+	if (n>=3) if (argtype(3)==1) {
+		sl = $o3
+	}
+	if (object_id(sl,1) == -1)	sl = simsecs_G_
+	
+	count = SectionListCount(sl)
+
+	objref rvec_G_[count]
+	i=0
+	forsec sl {
+		rvec_G_[i] = new Vector()
+		rvec_G_[i].record(&v(0.5))
+		i=i+1
+	}
+
+	if (n > 3) {
+		tstop = $4
+	} else tstop = tstart+pdur+250
+
+	if (verbosity > 0) printf("saving param file ... \n")
+
+	sprint(strtmp, "%s/%s/%s_prm.txt", DATADIR, subdir, datafile )
+	SaveParams( strtmp )
+
+	if (verbosity > 0) printf("running simulation ... \n")
+	
+	Vstim = new SEClamp(0.5)
+	Vstim.dur[0] = tstart
+	Vstim.dur = pdur
+	ivec_G_.record(&Istim.i)
+
+	i=0
+	forsec sl {
+	//for (i=0; i<count; i=i+1) {
+	
+		for (j=0; j<amp.size(); j=j+1) {
+		
+			Istim.loc(0.5)		// move current clamp to cas
+			Istim.amp = amp.x[j] // set amplitude of current step (nA)
+
+			finitialize(v_init)
+			run()
+
+// 			sprint( filename, "%s%s%s/%s_%s_%g", basepath, datadir, datestr, datafile, secname(),amp.x[j] )
+			sprint( filename, "%s/%s/%s_%s_%g", DATADIR, subdir, datafile, secname(), amp.x[j] )
+
+			sprint( headerstr, "Step simulation\ntstart=%g\tpdur=%g\nAmp: %g\n",tstart,pdur,amp.x(j) )
+			if (verbosity > 3) printf("%s\n", headerstr)
+
+			SaveData( filename, headerstr, count, 1, 1 )
+
+			if (verbosity > 3) printf("Step finished\n")
+		}
+		i+=1
+		if (verbosity > 1) printf("finished sags for %g of %g locations\n", i, count)
+	}
+	
+	dt = tmp
+	steps_per_ms = tmp2
+
+}
+*/
+
+proc ChirpSet() { local n,k, i, tmp,tmp2,amp, count,sp	 localobj sl, CO, dcs
+// ChirpSet( filename, chirp obj, section list, dcs, dt, amp)
+// applies the same chirp current ($o2) to multuple sections ($o3) with different holding currents ($o4)
+// and saves resulting data to text files with base name $s1
+// ChirpSet( "ZD", 0, 0, dcs )
+// -- changed to also save the input impedance amp and phase calculated by the built-in Impedance class
+
+
+	n = numarg()
+	
+	sp = issplit()
+
+	tmp = dt		// store dt value to reset at end
+	tmp2 = steps_per_ms
+	dt = 0.1		// set dt step to long interval (ms)
+	if (n>=5) if (argtype(5)==0) {
+		dt = $5
+	}
+	steps_per_ms = 1/(dt*Gstep)
+	amp=1
+	if (n>=6) if (argtype(6)==0) {
+		amp = $6
+	}
+	tstart = 2500
+	
+	// InjectChirp(1, 0.1, 0.24, tstart, 2, 20000)
+	idc_G_[0] = new IClamp(0.5)
+	
+	seclist = 2
+	
+	subdir = "chirps"
+	
+	sprint(strtmp,"mkdir %s/%s", DATADIR, subdir)
+	system(strtmp)
+
+	datafile = $s1
+	
+	// get the chirp object
+	if (n>=2) if (argtype(2)==1) {
+		CO = $o2
+	}
+	if (object_id(CO,1) == -1)	{
+		if ((object_id(cw_G_,1) == -1) || (cw_G_.has_loc==0)) InjectChirp(amp, 0.05, 0.24, tstart, 2, 20000)
+		CO = cw_G_
+	}
+	
+	if (n>=3) if (argtype(3)==1) {
+		sl = $o3
+	}
+	if (object_id(sl,1) == -1)	{
+		SaveSections(seclist)
+		sl = simsecs_G_
+	}
+
+	if (object_id(CO,1) == -1) {
+		if (verbosity > 0) printf("ChirpSet: chirp object is empty. aborting simulation\n")
+		return
+	}
+	if (object_id(sl,1) == -1) {
+		if (verbosity > 0) printf("ChirpSet: No sections in list is empty. aborting simulation\n")
+		return
+	}
+	
+	CO.amp=amp
+	
+	// get the dc holding current values to use
+	if (n<4) {
+		dcs = new Vector(4)
+		dcs.x[0]=0
+		dcs.x[1]=-2
+		dcs.x[2]=-4
+		dcs.x[3]=2
+	} else {
+		if (argtype(4)==1) {
+			dcs=$o4
+		} else if (argtype(4)==0) {
+			dcs = new Vector(1)
+			dcs.x[0]=$4
+		} else {
+			dcs = new Vector(4)
+			dcs.x[0]=0
+			dcs.x[1]=-2
+			dcs.x[2]=-4
+			dcs.x[3]=2
+		}
+	}
+	
+	count = SectionListCount(sl)
+	objref rvec_G_[count]
+	objref objtmp[count]
+	
+	i=0
+	forsec sl {
+		objtmp[i] = new IClamp(0.5)
+		rvec_G_[i] = new Vector()
+		rvec_G_[i].record(objtmp[i], &v(0.5), RecDt)
+		rvec_G_[i].label(secname())
+		i=i+1
+	}
+
+// 	tvec_G_.record(cw_G_,&t,Dt)
+
+    if (idc_G_[0].has_loc()==0) idc_G_[0].loc(0.5)
+	idc_G_[0].dur = CO.dur+tstart
+	idc_G_[0].del = 50
+		
+	if (verbosity > 1) printf("ChirpSet: saving param file ... \n")
+
+	sprint(strtmp, "%s/%s/%s_prm.txt", DATADIR, subdir, datafile )
+	SaveParams( strtmp )
+
+	if (verbosity > 1) printf("ChirpSet: running simulation ... \n")
+	
+	if (RecDt<dt) {
+		tvec_G_.record(idc_G_[1], &t, dt)
+	} else {
+		tvec_G_.record(idc_G_[1], &t, RecDt)
+	}
+	
+	i=0
+	forsec sl {
+	
+// 		if (sp)	stopPar()
+
+		CO.loc(0.5)
+
+		if (RecDt<dt) {
+			ivec_G_.record(cw_G_, &CO.i, dt)
+		} else {
+			ivec_G_.record(cw_G_, &CO.i, RecDt)
+		}
+	
+		idc_G_[0].loc(0.5)
+		
+// 		if (sp) startPar()
+
+		for n=0,dcs.size()-1 {
+			//InjectChirp(1, 0.05, 0.24, tstart, 2, dur, dcs.x[n], 100, 22000)
+
+			idc_G_[0].amp = dcs.x[n]
+			
+			if (idc_G_[0].amp == 0) {
+				tstart = 400
+			} else {
+				tstart = 2500
+			}
+			CO.t1 = tstart
+			tstop = tstart+CO.dur+250
+
+			run()
+
+			for k=0,gvec_G_.count()-1 {
+				if (verbosity > 3) printf("ChirpSet: %s has length %g\n", gvec_G_.o(k).label, gvec_G_.o(k).size)
+			}
+		
+			if (verbosity > 3) printf("ChirpSet: saving data ... \n")
+
+			sprint( filename, "%s/%s/%s_%s_%g", DATADIR, subdir, datafile, secname(), dcs.x[n] )
+			
+			sprint( headerstr, "Chirp simulation\ntstart=%g\tdur=%g\nAmp: %g\tDC: %g\n",\
+				tstart, CO.dur, CO.amp, dcs.x[n] )
+			
+			SaveData( filename, headerstr, count, 1, 1 )
+
+			if (verbosity > 3) printf("Chirp finished\n")
+		}
+		i+=1
+		if (verbosity > 1) printf("ChirpSet: finished chirps for %g of %g locations\n", i, count)
+
+	}
+	
+	idc_G_[0].amp = 0
+	dt = tmp
+	steps_per_ms = tmp2
+	
+	if (verbosity > 0) printf("ChirpSet: All chirps finished\n")
+}
+
+
+proc SumStim() { local i,j,k, n, count, ims		localobj amp, delay, sl, Istim, dcs
+// SumStim( savename, delays, dcs, amps, section list, dt)
+// SumStim("test", 10)
+
+	n = numarg()
+	if (n<1) {
+		if (verbosity > 1) printf("SumStim: Must give a file name. aborting simulation\n")
+		return
+	}
+	
+	tmp = dt		// store dt value to reset at end
+	tmp2 = steps_per_ms
+	steps_per_ms = 5
+	dt = 0.02		// set dt step to short interval (ms)
+
+	if (n>=6) if (argtype(6)==0) {
+		dt = $6
+	}
+	
+	tstart = 500
+	tstop = 1000
+	idc_G_[0] = new IClamp(0.5)
+	
+	seclist = 2
+	
+	subdir = "sEPSP"
+	
+	sprint(strtmp,"mkdir %s/%s", DATADIR, subdir)
+	system(strtmp)
+
+	datafile = $s1
+	
+	if (n>=4) {
+	if (argtype(4)==0)	{
+		amp = new Vector(1)
+		amp.x[0]=$4
+		if (verbosity > 3) printf("SumStim: using single amp: %g nA ... \n", amp.x[0])
+	} else if (argtype(4)==1)	{
+		amp=$o4
+	} else {
+		amp = new Vector(1)
+		amp.x[0]=2
+	}
+	} else {
+		amp = new Vector(1)
+		amp.x[0]=2
+	}
+	
+	if (n<2) {
+		delay = new Vector(3)
+		delay.x[0]=5
+		delay.x[1]=10
+		delay.x[2]=20
+	} if (argtype(2)==0)	{
+		delay = new Vector(1)
+		delay.x[0]=$2
+		if (verbosity > 3) printf("SumStim: using single delay: %g ms ... \n", delay.x[0])
+	} else if (argtype(2)==1)	{
+		delay=$o2
+	}
+
+	if (n>=5) if (argtype(5)==1) {
+		sl = $o5
+	}
+	if (object_id(sl,1) == -1)	{
+		SaveSections(seclist)
+		sl = simsecs_G_
+	}
+
+	if (object_id(sl,1) == -1) {
+		if (verbosity > 0) printf("SumStim: No sections in list is empty. aborting simulation\n")
+		return
+	}
+
+	// get the dc holding current values to use
+	if (n<3) {
+		dcs = new Vector(4)
+		dcs.x[0]=0
+		dcs.x[1]=-2
+		dcs.x[2]=-4
+		dcs.x[3]=2
+	} else {
+		if (argtype(3)==1) {
+			dcs=$o3
+		} else if (argtype(3)==0) {
+			dcs = new Vector(1)
+			dcs.x[0]=$3
+		} else {
+			dcs = new Vector(4)
+			dcs.x[0]=0
+			dcs.x[1]=-2
+			dcs.x[2]=-4
+			dcs.x[3]=2
+		}
+	}
+	
+	count = SectionListCount(sl)
+	objref rvec_G_[count]
+	objref objtmp[count]
+
+	i=0
+	forsec sl {
+		objtmp[i] = new IClamp(0.5)
+		rvec_G_[i] = new Vector()
+		rvec_G_[i].record(objtmp[i], &v(0.5), RecDt)
+		rvec_G_[i].label(secname())
+		i=i+1
+	}
+
+// 	tvec_G_.record(cw_G_,&t,Dt)
+
+//     if (idc_G_[0].has_loc()==0) idc_G_[0].loc(0.5)
+// 	idc_G_[0].dur = 400+tstart
+// 	idc_G_[0].del = 50
+		
+	if (verbosity > 1) printf("SumStim: saving param file ... \n")
+
+	sprint(strtmp, "%s/%s/%s_prm.txt", DATADIR, subdir, datafile )
+	SaveParams( strtmp )
+
+	if (verbosity > 1) printf("SumStim: running simulation ... \n")
+	
+	i=0
+	forsec sl {
+
+		idc_G_[0].loc(0.5)
+// 		ivec_G_.record(idc_G_[0], &sp_G_.i, RecDt)
+
+		for n=0,dcs.size()-1 {
+
+// 			idc_G_[0].amp = dcs.x[n]
+
+			for (j=0; j<amp.size(); j=j+1) {
+		
+				for (k=0; k<delay.size(); k=k+1) {
+			
+					if (dcs.x[n]==0) {
+						tstop = tstart+5*delay.x[k]+50
+						tstart = 450
+						{SumPulse( amp.x[j], 5, delay.x[k], tstart )}
+					} else {
+						tstart = 500
+						tstop = tstart+5*delay.x[k]+250
+						SumPulse( amp.x[j], 5, delay.x[k], tstart, dcs.x[n], 50, tstop-100 )
+					}
+
+// 					finitialize(v_init)
+					run()
+		
+					if (verbosity > 3) printf("SumStim: saving data ... \n")
+
+					sprint( filename, "%s/%s/%s_%s_%g_%g", DATADIR, subdir, datafile, secname(), dcs.x[n], delay.x[k] )
+
+					sprint( headerstr, "Sum Pulse simulation\ntstart=%g\nAmp: %g\nDelay: %g\nDC: %g\n",\
+						tstart, amp.x(j), delay.x(k), dcs.x[n] )
+			
+					SaveData( filename, headerstr, count, 1, 1 )
+
+					if (verbosity > 3) printf("SumStim finished\n")
+				}
+			}
+		}
+	}
+	
+	idc_G_[0].amp = 0
+	dt = tmp
+	steps_per_ms = tmp2
+	
+	if (verbosity > 0) printf("SumStim: All sEPSP finished\n")
+}
+
+
+

@@ -1,0 +1,578 @@
+
+
+proc SaveParams() { // local ims localobj LGMD, file, this
+// SaveParams( file name )
+// Saves global values and "forall psection()" to a text file
+// this file could then be loaded to recreate the model state (need custom file loader to handle point processes)
+
+    hoc_stdout($s1)
+    
+    PrintGlobals()
+    forall psection()
+
+    hoc_stdout()
+
+	if (verbosity > 1) printf("Saved global and section parameters to file ... \n")
+	
+}
+
+proc PrintGlobals() { local i,j,k,size,ptf localobj gls, ms, fobj, strobj
+// Prints the values of global parameters for membrane mechanisms
+//
+// PrintGlobals()
+// PrintGlobals( File )
+// PrintGlobals( List )
+// PrintGlobals( strdef )
+//
+// if List is empty or not given, all mechanisms from MechanismType(0) with global values are printed
+// if a strdef is given, all global values for the mechanism with the given name are printed
+
+ptf=0
+strobj = new String()
+
+	if (numarg() > 0) {
+		if (argtype(1) == 1) {
+			if (isclass($o1, "List")) {
+				gls = $o1
+			} else if (isclass($o1, "File")) {
+				ptf=1
+				fobj = $o1
+				gls = new List()
+				MechList(gls)
+			}
+		} else if (argtype(1)==2) {
+			gls = new List()
+			MakeStringList(gls,$s1)
+		} else if (argtype(1)==0) {
+			gls = new List()
+			MechList(gls)
+		}
+	} else {
+		gls = new List()
+		MechList(gls)
+	}
+	
+	for j=0,gls.count()-1 {
+
+		ms = new MechanismStandard(gls.o(j).s, -1)
+		if (ms.count == 0) { continue }
+
+		for i=0, ms.count -1 {
+			size = ms.name(tmpstr, i)
+			if (size == 1) {
+				sprint(strtmp, "hoc_ac_ = %s", tmpstr)
+				execute(strtmp)
+				if (ptf==1) {
+					fobj.printf("%s = %g\n", tmpstr, hoc_ac_)
+				} else printf("%s = %g\n", tmpstr, hoc_ac_)
+			} else if (size < 20) {
+				for k=0, size-1 {
+					sprint(strtmp, "hoc_ac_ = %s[%d]", tmpstr, k)
+					execute(strtmp)
+					if (ptf==1) {
+						fobj.printf("%s[%d] = %g\n", tmpstr, k, hoc_ac_)
+					} else printf("%s[%d] = %g\n", tmpstr, k, hoc_ac_)
+				}
+			} else {
+				if (ptf==1) {
+					fobj.printf("%s[0 - %d]\n", tmpstr, size-1)
+				} else printf("%s[0 - %d]\n", tmpstr, size-1)
+			}
+		}
+	}
+}
+
+
+proc SaveParams_old() { local ims localobj LGMD, file// , this
+// SaveParams( file name )
+// Create a ModelView object and save contents to a text file
+
+	ims = issplit()		// check if multisplit is on
+	if (ims) stopPar()	// if multisplit is on, stop it so ModelView contains only 1 cell
+	
+	LGMD = new ModelView(0)	// create ModelView object for saving parameters 
+	if (verbosity > 1) printf("ModelView created ... \n")
+	
+	file = new File($s1)
+	file.wopen()
+	
+	i=0
+	//object_push(LGMD)
+	//if (verbosity > 2) printf("ModelView pushed ... \n")
+	for i=0,LGMD.display.top.count-1 {
+		MVtextout(file, LGMD.display.top.object(i))
+	}
+	//object_pop()
+	//if (verbosity > 2) printf("ModelView popped ... \n")
+
+	file.close()
+	
+//	PrintMView( LGMD, $s1 )	// save ModelView object to file 
+	LGMD.destroy()			// destroy ModelView to free up memory
+	
+	if (ims) startPar()		// restart parallelization if needed
+	
+}
+
+proc MVtextout() { local i
+	$o1.printf("%s\n", $o2.s)
+	if ($o2.children != nil) {
+		for i=0, $o2.children.count-1 {
+			MVtextout($o1, $o2.children.object(i))
+		}
+	}
+}
+
+
+proc SaveData() { local i,k, count, ti, tg	localobj savdata, rec_matrix
+//SaveData( filename, headerstr, Vm count, Im, G )
+
+	if (numarg()<3) {
+		if (verbosity > 0) printf("SaveData: not enough inputs. Not Saving \n")
+		return
+	} else if (verbosity > 1) printf("SaveData: saving data ... \n")
+
+	savdata = new File()
+	savdata.wopen($s1)
+	count = $3
+
+	if (verbosity > 2) printf("SaveData: opened file %s for writing ... \n", $s1)
+
+	ti=0
+	tg=0
+	k = count+1
+	if (numarg() > 3)	ti = $4
+	if (numarg() > 4)	tg = $5
+	if (ti) k+=1
+	if (tg)	k+=gvec_G_.count()
+
+	if (verbosity > 2) printf("SaveData: saving voltage of %g sections plus %g additional vectors\n", count, ti-1)
+	rec_matrix = new Matrix(tvec_G_.size(), k)
+// 	rec_matrix.resize(tvec_G_.size(), count+ti)
+	rec_matrix.setcol(0,tvec_G_)
+	for (i=1; i<=count; i=i+1) {
+		rec_matrix.setcol(i,rvec_G_[i-1])
+	}
+	if (ti) {
+		rec_matrix.setcol(i,ivec_G_)
+		i+=1
+	}
+	if (tg) {
+		for k=0,gvec_G_.count()-1 {
+			rec_matrix.setcol(i,gvec_G_.o(k))
+			if (verbosity > 3) printf("SaveData: saving %s of length %g in column %g\n", gvec_G_.o(k).label, gvec_G_.o(k).size, i)
+			i+=1
+		}
+	}
+
+	savdata.printf($s2)
+	rec_matrix.fprint(savdata,"%-1.8g ")
+	savdata.printf( "time " )
+// 	fix this bug. simsecs_G_ might not be used
+// 	forsec simsecs_G_ savdata.printf( "%s ", secname() )
+	for k=0,count-1 {
+		savdata.printf( "%s ", rvec_G_[k].label() )
+	}
+	if (ti) savdata.printf( "Im " )
+	if (tg) {
+		for k=0,gvec_G_.count()-1 {
+			savdata.printf( "%s ", gvec_G_.o(k).label() )
+		}
+	}
+	savdata.printf( "\n" )
+	savdata.close()
+
+}
+
+proc SaveImpedanceProfile() {local x,a,fmin,fmax,fres,f,fr,ims,logf,extend,nc,nf,IA,TA,IP,TP	localobj sref,Imp,fobj,sl,strobj
+// SaveImpedanceProfile( filename, section(s), max freq, min freq, freq step, dv/dt, transfer)
+//	calculates and prints input impedance and phase values for specified sections
+//	at frequencies of minfreq:freqstep:maxfreq. If dv/dt (6th argin) is specified and true
+//  then the extended Impedance calculation using active states is used. If transfer (7th argin)
+//	is true, then the siz transfer impedance is also measured (from section to siz)
+// Ex. SaveImpedanceProfile( "AllImpedances_active", "", 50, 0, 0.2, 1)
+
+	if (numarg()<2) {
+		if (verbosity > 0) printf("SaveImpedanceProfile: not enough inputs. Not Saving \n")
+		return
+	} else if (verbosity > 3) printf("SaveImpedanceProfile: saving profiles ... \n")
+	
+	sl = new SectionList()
+	if (argtype(2)==1) {
+		sl = $o2
+	} else if (argtype(2)==2) {
+		forall ifsec $s2 sl.append()
+	} else {
+		if (verbosity > 0) printf("SaveImpedanceProfile: 2nd argin must be section string or SectionList\n")
+		return
+	}
+
+	strobj = new String()
+
+	ims=0
+	execute1("ims = issplit()",0)	// if func doesn't exist, than parinit hasn't been loaded
+// 	ims = name_declared("issplit")
+// 	ims = issplit()		// check if multisplit is on
+	if (ims) stopPar()	// if multisplit is on, stop it
+	
+	fmin=0
+	fmax=50
+	fres = 0.5
+	extend=0
+	transfer=0
+	if (numarg() > 2)	fmax = $3
+	if (numarg() > 3)	fmin = $4
+	if (numarg() > 4)	fres = $5
+	if (numarg() > 5)	extend=$6
+	if (numarg() > 6)	transfer=$7
+	
+	if ((fmax-fmin) > 100)	{
+		logf=1
+		if (fres>0.1) fres=log10(fres)
+		if (fres<=0) fres=0.05
+	} else logf=0
+	
+	subdir = "impedance"
+	sprint(strobj.s,"mkdir %s/%s", DATADIR, subdir)
+	system(strobj.s)
+
+	if (verbosity > 1) printf("SaveImpedanceProfile: saving param file ... \n")
+
+	sprint(strobj.s, "%s/%s/%s_prm.txt", DATADIR, subdir, $s1 )
+	SaveParams( strobj.s )
+	
+	Imp = new Impedance()
+	sref = new SectionRef()
+	Imp.loc(0.5)
+
+	fobj = new File()
+	sprint(filename, "%s/%s/%s", DATADIR, subdir, $s1 )
+	fobj.wopen(filename)
+	
+	if (verbosity > 2) printf("SaveImpedanceProfile: opened file %s for writing ... \n", filename)
+
+// start printing header
+	fobj.printf( "ImpedanceProfiles\n" )
+	fobj.printf( "Min frequency = %g (Hz)\n", fmin)
+	fobj.printf( "Max frequency = %g (Hz)\n", fmax)
+	fobj.printf( "Frequency step = %g (Hz)\n", fres)
+	fobj.printf( "dV/dt on = %g\n", extend)
+
+	if (logf==1) {
+		fmin = log10(fmin)
+		if (fmin<-2) fmin = -2
+		fmax = log10(fmax)
+	}
+	
+	nc=0
+	forsec sl nc+=1
+	nf=0
+	for (f=fmin; f <= fmax; f=f+fres) nf+=1
+
+	fobj.printf( "%g %g\n", nf, nc)
+// finish printing header
+
+// start printing labels
+	fobj.printf( "freq\t" )
+	forsec sl {
+		fobj.printf( "%s.ZAP(MOhm)\t", secname() )
+		fobj.printf( "%s.ZPP(deg)\t", secname() )
+		if (transfer) {
+			fobj.printf(  "%s.ZtrAP(MOhm)\t", secname() )
+			fobj.printf( "%s.ZtrPP(deg)\t", secname() )
+		}
+	}
+	fobj.printf( "\n" )
+// finish printing labels
+	
+	for (f=fmin; f <= fmax; f=f+fres) {
+	
+		if (logf==1) {
+			fr = 10^f
+		} else {
+			fr=f
+		}
+		Imp.compute(fr,extend)
+		fobj.printf( "%-1.8g\t", fr)
+
+		forsec sl {
+			
+			if (nseg == 1) {
+// 			due to bug in neuron transfer has to be measured before input if using extended calculation
+				if (transfer) {
+// 					if (extend) {	// very inefficient but I don't know another way that works
+// 						sref.sec { Imp.compute(fr,extend) }
+// 					}
+					TA = Imp.transfer(0.5)
+					TP = Imp.transfer_phase(0.5)/PI*180
+				}
+				IA = Imp.input(0.5)
+				IP = Imp.input_phase(0.5)/PI*180
+			} else {
+				IA=0
+				IP=0
+				TA=0
+				TP=0
+				a=0
+				for (x,0) {
+					if (transfer) {
+// 						if (extend) {	// very inefficient but I don't know another way that works
+// 							sref.sec { Imp.compute(fr,extend) }
+// 						}
+						TA += Imp.transfer(x)*area(x)
+						TP += Imp.transfer_phase(x)*area(x)
+					}
+					a += area(x)
+					IA += Imp.input(x)*area(x)
+					IP += Imp.input_phase(x)*area(x)
+				}
+				IA=IA/a
+				IP=IP/PI*180/a
+				if (transfer) {
+					TA=TA/a
+					TP=TP/PI*180/a
+				}
+			}
+
+			fobj.printf( "%-1.8g\t", IA)
+			fobj.printf( "%-1.8g\t", IP)
+			if (transfer) {
+				fobj.printf( "%-1.8g\t", TA)
+				fobj.printf( "%-1.8g\t", TP)
+			}
+		}
+		fobj.printf( "\n" )
+	}
+	fobj.printf( "\n" )
+	fobj.close()
+	
+	if (ims) startPar()
+}
+
+proc PassiveImpedances() {local gl,ra,cap, neg	localobj sl, name
+// PassiveImpedances( cell name, sections, Gm, Ra, Cm, neg)
+// 	cell name is required, other inputs optional
+
+	if (argtype(1)==2) {
+		name = new String($s1)
+	} else {
+		if (argtype(1)==1) {
+			if (isclass($o1,"String")) name = $o2
+		}
+	}
+	if (isclass(name,"String") == 0) {
+		if (verbosity > 1) printf("PassiveImpedances: Must specify a cell name as strdef or String\n")
+		return
+	}
+	
+	sl = new SectionList()
+	if (numarg() < 2) {
+		forall sl.append()
+	} else {
+		if (argtype(2)==1) {
+			if (isclass($o2,"SectionList")) {
+				sl = $o2
+			} else {
+				if (verbosity > 1) printf("PassiveImpedances: 2nd argin must be strdef or SectionList\n")
+				return
+			}
+		} else if (argtype(2)==2) {
+			forall ifsec $s2 sl.append()
+		} else {
+			if (verbosity > 1) printf("PassiveImpedances: 2nd argin must be strdef or SectionList\n")
+			return
+		}
+	}
+	
+	gl=1e-4
+	ra=-1
+	cap = -1
+	neg = 1
+	if (numarg() > 2)	gl = $3
+	if (numarg() > 3)	ra = $4
+	if (numarg() > 4)	cap= $5
+	if (numarg() > 5)	neg= $6
+	
+	forall {
+		insert pas
+		g_pas = gl
+		if (ra>=0) { Ra = ra }
+		if (cap>=0) { cm = cap }
+	}
+	
+	sprint(name.s,"%s_passive_Z", $s1)
+	SaveImpedanceProfile( name.s, sl, 5000, 0.05, 0.03, 0, 1)
+	if (neg==1) {
+		forall cm=cm*-1
+		sprint(name.s,"%s_passive_Z_negCm", $s1)
+		SaveImpedanceProfile( name.s, sl, 5000, 0.05, 0.03, 0, 1)
+		forall cm=cm*-1
+	}
+}
+
+proc WeightedMeanTransferImpedance() {local gl,ra,cap,k,rcp,rca,tw,i,x,w,sw,wTP,fmin,fmax,fres,f,n,NSeg,nf,ta,zp,pu	localobj strobj,SD,pZ,Z,ia,SL,mTA,wmTP
+// WeightedMeanTransferImpedance( name, SectionList, pu, gl, ra, cm )
+// i.e. WeightedMeanTransferImpedance("purkinje_full", "", 0, 1e-4, 350, 0.8)
+// generate NSeg by NSeg matrix (init to false)
+
+	SL = new SectionList()
+	if (numarg()>1) {
+		if (argtype(2)==1) { SL = $o2
+		} else if (argtype(2)==2) { forsec $s2 SL.append()
+		}
+	} else {
+		forall SL.append()
+	}
+	
+	strobj = new String()
+	subdir = "impedance"
+	sprint(strobj.s,"mkdir %s/%s", DATADIR, subdir)
+	system(strobj.s)
+
+	if (verbosity > 1) printf("WeightedMeanTransferImpedance: saving param file ... \n")
+	sprint(strobj.s, "%s/%s/%s_prm.txt", DATADIR, subdir, $s1 )
+	SaveParams( strobj.s )
+
+
+	if (verbosity > 4) printf("WeightedMeanTransferImpedance: SectionList is %s\n", SL)
+
+	NSeg=0	// number of segments
+	n=0		// outer loop iterator
+	ta = totalarea()
+// 	rcp = new Vector()
+
+	nf=0
+	fmin=-1.4	// minimum frequency log10 units (0.04 Hz)
+	fmax=3.7	// maximum frequency log10 units (4 kHz)
+	fres=0.03	// frequency step size log10 units
+	for (f=fmin; f <= fmax; f=f+fres) {
+// 		rcp.append( atan(-2*PI*10^f*cm*1e-6/g_pas)	) // phase (rad) of isopotential cell
+		nf+=1
+	}
+
+	gl = -1
+	ra=-1
+	cap=-1
+	pu = 0
+	if (numarg() > 2)	pu = $3
+	if (numarg() > 3)	gl = $4
+	if (numarg() > 4)	ra = $5
+	if (numarg() > 5)	cap= $6
+	
+
+	forall {
+		if (gl>=0) {
+			insert pas
+			g_pas = gl
+		}
+		if (ra>=0) { Ra = ra }
+		if (cap>=0) { cm = cap }
+		for (x,0) {
+			NSeg+=1
+			ifsec SL n+=1
+		}
+	}
+// 	this assumes that membrane capacitance is uniform	
+	gl = meanRm(SL,0,1)
+
+	if (verbosity > 3) printf("WeightedMeanTransferImpedance: number of segments = %g.	nf = %g \n", n, nf)
+
+// allocate wmTP matrix (NSeg,nf)
+	mTA = new Matrix(n,nf)
+	wmTP = new Matrix(n,nf)
+	pZ  = new Matrix(n,3)
+	ia = new Matrix(NSeg,3)
+	
+	Z = new Impedance()
+	// outermost loop through all segments
+	n=0		// outer loop iterator
+
+	tw = 2*PI*cm*1e-6/gl
+
+	forsec SL {
+		for (x,0) {
+			Z.loc(x)
+			ia.zero()
+			nf=0	// frequency iterator
+			// 	loop through frequencies
+			if (verbosity > 4) if (n==0) printf("WeightedMeanTransferImpedance: starting first freq loop\n")
+			for (f=fmin; f <= fmax; f=f+fres) {
+
+				rcp = atan(-tw*10^f)	 // phase (rad) of isopotential cell
+				omega = 2*PI*10^f
+				rct = rcp/omega
+				rca = 1e2/(gl*ta*(1+(tw*10^f)^2)^0.5)	// amplitude (Mohm) of isopotential cell
+// 				rcp = IsoEquivPhase(10^f,SL)
+// 				rca = IsoEquivAmp(10^f,SL)
+				Z.compute(10^f,pu)
+	// 			fobj.printf( "%-1.8g\t", 10^f)
+// 				IA = Z.input(x)
+
+				sw=0
+				wTP=0
+				k=0		// inner section loop iterator
+				forall {
+					for (i,0) {
+// 						sa = area(x)			// segment area (cm2)
+						zp = Z.transfer_phase(i)	// Ztr phase (rad)
+						w = Z.transfer(i)*area(i)	// Ztr amp x area (Mohm•cm2)
+						wTP += zp*w				// Ztr amp x phase x area (rad•Mohm•cm2)
+						sw += w					// sum (across segments) Ztr amp x area (Mohm•cm2)
+						ia.x[k][0] += (zp-rcp)*w*10^f*(1-10^fres)	// net Ztr phase (for segment) x amp x area (rad•Mohm•cm2•df)
+						ia.x[k][2] += (zp-rcp)*w*(1-10^fres)	// net Ztr delay (for segment) x amp x area (Mohm•cm2•df)
+						ia.x[k][1] += (Z.transfer(i)-rca)*10^f*(1-10^fres)	// net Ztr amp (for segment) (Mohm•df)
+						k+=1
+					}
+				}
+				if (verbosity > 4) if (n==0) if (nf==0) printf("WeightedMeanTransferImpedance: first freq loop n:%g nf:%g\n",n,nf)
+				mTA.x[n][nf] = sw/ta	// mean (across segments) Ztr amp (Mohm) - weighted by segment area
+				wmTP.x[n][nf] = wTP/sw*DEG	// mean (across segments) Ztr phase (deg) - weighted by segment area and Ztr
+				nf+=1
+			}
+			if (verbosity > 4) if (n==0) printf("WeightedMeanTransferImpedance: finished first freq loop\n")
+			k=0
+			forall {
+				for (i,0) {
+					if (ia.x[k][0] > 0) pZ.x[n][0] += area(i)/ta
+					// normalized surface area with Ztr phase > RC phase (1) - weighted by Ztr amp across freqs
+					if (ia.x[k][1] > 0) pZ.x[n][1] += area(i)/ta
+					if (ia.x[k][2] > 0) pZ.x[n][2] += area(i)/ta
+					k+=1
+				}
+			}
+			n+=1
+		}
+		if (verbosity > 3) if (n==1) printf("WeightedMeanTransferImpedance: finished first section\n")
+
+// 		SL.remove()
+	}
+	
+	
+	SD = new File()
+	sprint(strobj.s, "%s/%s/%s_mTA", DATADIR, subdir, $s1 )
+	SD.wopen(strobj.s)
+	
+	mTA.fprint(SD,"%-1.8g ")
+	SD.printf( "\n" )
+	SD.close()
+
+	SD = new File()
+	sprint(strobj.s, "%s/%s/%s_wmTP", DATADIR, subdir, $s1 )
+	SD.wopen(strobj.s)
+	
+	wmTP.fprint(SD,"%-1.8g ")
+	SD.printf( "\n" )
+	SD.close()
+
+	SD = new File()
+	sprint(strobj.s, "%s/%s/%s_pZ", DATADIR, subdir, $s1 )
+	SD.wopen(strobj.s)
+	
+	pZ.fprint(SD,"%-1.8g ")
+	SD.printf( "\n" )
+	forsec SL SD.printf( "%s ", secname() )
+	SD.close()
+	
+	
+}
+

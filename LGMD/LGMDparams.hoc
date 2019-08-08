@@ -1,0 +1,172 @@
+// this sets the variables used by LGMD_model files, funcs and procs.
+// When creating new procedures, use local variables when possible.
+// As needed add new global variables to the list below
+
+
+// ---- Global strdef
+// there are no local strdefs in nrn
+strdef NRNDIR				// NRNDIR is base directory of model
+strdef syndir				// syndir is subdirectory containing synapse files
+strdef esynfullpath			// filepath of excitatory synapse file
+strdef isynfullpath			// filepath of inhibitory synapse file
+strdef DATADIR, datadir_	// DATADIR is full path of directory where simulation data is saved
+strdef subdir				// data subdirectory
+strdef strtmp, tmpstr		// tmp strings used by several procs & funcs (there are no local strdef in hoc)
+strdef datafile				// name of data file being saved
+strdef filename
+strdef AECmap
+strdef headerstr			// header at top of data file
+strdef cwd					// working directory
+strdef sect
+strdef Hname, KDname
+KDname = "KD"
+Hname = "h"
+// ------
+
+
+// ---- Global objref
+objref StrFx			// StringFunction object 
+objref esyn, isyn		// lists of excitatory and inhibitory synapse objects
+objref espont, ispont	// Lists of spontaneous synapse objects
+esyn = new List()
+isyn = new List()
+objref syn, synlist		// List of all synapse objects inserted
+synlist = new List()
+objref synfilelist		// List of synapse filenames to include in batch sims
+objref sref				// SectionRef
+objref MS_				// MechanismStandard
+objref KDchan,Hchan,Mchan,CaTchan,KAchan		// chanAnalysis objects for logging mean conductance
+objref AREAS
+objref GLS
+objref objtmp[1]
+
+// SectionList objects to subdivide the LGMD
+objref Ctines,Chandle,InhEnds
+objref ParentBranch,ChildBranch
+objref FieldA, TineBase
+objref TineEnds
+objref siz
+objref KDList, HList, MList, CaTList, KAList
+HList = new SectionList()
+KDList = new SectionList()
+KAList = new SectionList()
+MList = new SectionList()
+CaTList = new SectionList()
+
+Ctines = new SectionList()		// Field C branches
+Chandle = new SectionList()		// neurite connecting Field C to Handle
+InhEnds = new SectionList()		// End compartments of Field B and C branches
+ParentBranch = new SectionList()	// 
+ChildBranch = new SectionList()
+//FindBranches( ParentBranch, ChildBranch, FieldA)
+TineBase = new SectionList()
+// FindFieldBase( TineBase, "MainTrunk", "Tines" )
+TineEnds = new SectionList()
+// FindEnds(TineEnds,"Tines")
+
+MakeSecList( siz, "soma", "SIZ")
+MakeSecList( FieldA, "MainTrunk", "Tines")
+
+// I use the '_G_' suffix for many global objects to decrease the chances of name conflicts
+objref idc_G_[2]			// Array of step currents (IClamp objects) used for dc holding current
+objref sp_G_[5]				// Array of sum pulses (sEPSP objects) used for summation sims
+objref cw_G_				// Chirp current (chirp object) used for ZAP measure sims
+objref simsecs_G_			// SectionList specifying sections from which to record simulation data
+objref rvec_G_[1], tvec_G_	// time and data vectors to record during simulation
+objref ivec_G_				// current vector to record
+objref gvec_G_				// conductance and state vectors to record during simulation
+objref vecList				// list of vectors (currently unused)
+RecDt = 0.2					// Sample interval (ms) for saving recorded data to file (should be multiple of dt)
+Gstep = 5					// How many time steps between measuring conductances
+
+idc_G_[1] = new IClamp()
+// Tines[1] idc_G_[1].loc(0.5)
+idc_G_[1].loc(0.5)
+idc_G_[1].amp=0
+tvec_G_ = new Vector()
+tvec_G_.record(idc_G_[1], &t, RecDt)
+ivec_G_ = new Vector()
+ivec_G_.label("nA")
+gvec_G_ = new List()
+// cw_G_ = new chirp()
+
+// ------
+
+
+
+// ***** Setup input and output directory paths *****
+
+system("echo $NRNBASE", NRNDIR)	// retrieve path of local neuron simulation directory
+StrFx = new StringFunctions()
+strlen = StrFx.len(NRNDIR)
+StrFx.left(NRNDIR,strlen-1)		// remove newline character at end of string
+
+strtmp="date \"+%m%d%Y\" "
+system(strtmp,tmpstr)			// get current date
+strlen = StrFx.len(tmpstr)
+StrFx.left(tmpstr,strlen-1)	// remove newline character at end of string
+
+
+// make directory to save data
+datadir_ = "data/"				// data directory is named "data"
+sprint( DATADIR, "%s/%s%s", NRNDIR, datadir_, tmpstr )
+sprint(strtmp, "mkdir %s", DATADIR)
+system(strtmp)
+
+sprint( syndir, "%s/synapse", NRNDIR )
+// syndir = "/Users/rich/Documents/MATLAB/syns_spontaneous/0708/"
+
+
+// ***** End Setup input and output directory paths *****
+
+
+
+/* --- Initialize Global variables for LGMD simulation --- */
+
+loadsyn=2		// state. whether to load synapse files for visual stimulus. 0=none, 1=set file, 2=set directory 
+seclist=2		// state. sets which sections to add to SecList used by simulations
+
+synCa = 0		// state. synapse causes Ca influx (value enumerates different effects of Ca influx)
+recCa = 0		// boolean. whether to record cai instead of v
+acn = 0			// boolean. whether the moddel has cyclic nucleotide dependent mechs
+presyn=1		// boolean. Wether SimBatch procedure preloads synapses before starting sim
+AEC = 0			// boolean. Whether the morphology has been reduced into electrotonically equivalent cable(s) 
+
+// tstart = 350	// time to start simulations (ms). Allows model to reach steady state
+e4AP = 0.90		// effectiveness of 4AP application (0 = no effect, 1 = complete block)
+eZD = 0.95		// effectiveness of ZD7288 application (0 = no effect, 1 = complete block)
+eXE = 0.95		// effectiveness of XE991 application (0 = no effect, 1 = complete block)
+tstart=0		// the time (ms into simulation) that stimulus starts
+t0=0			// the time of collision for visual stimuli
+nSection=0		// number of sections in the model
+forall nSection+=1
+
+AREAS = new Vector(nSection)
+n=0
+forall {
+	AREAS.x[n] = area(0.5)
+	n+=1
+}
+SA = AREAS.sum()	// total surface area of cell
+/* --- end simulation globals */
+
+
+/* --- Initialize Global membrane variables --- */
+
+passive=0		// state. 0=full model, 1=no active conductances, 2=passive dendrites, 3=h and pas dendrites, 4=passive siz
+
+gl = 9.0e-6		// leak conductance (S/cm2) (for FieldA, some other sections set higher)
+el = -65		// leak reversal potential (mV)
+Cm = 0.80		// membrane capacitance (µF/cm2)
+axial = 350		// axial resistivity (Ωcm) (some sections ignore this value)
+SIZNa = 0.17	// sodium channel density at siz (S/cm2) (other sections scaled to this value)
+SIZKdr = 2.0e-2	// Kdr channel density at siz (S/cm2) (other sections scaled to this value)
+SIZM = 1.0e-3	// M channel density at siz (S/cm2) (other sections scaled to this value)
+EK = -77		// K+ reversal potential (mV)
+ENa = 50		// Na+ reversal potential (mV)
+ECa = 100		// initial Ca2+ reversal potential (mV), changes with Ca2+ influx and eflux
+Rabeforeg = 2	// 0: set condunctance then axial resistivity gradients, 1: set Ra then g, 2: no Ra gradient
+
+//	in locust saline (mM): [Na] = 144, [K] = 5, [Ca]=5, [Cl]=157
+
+

@@ -1,0 +1,100 @@
+// this sets the variables used by model files, funcs and procs.
+// When creating new procedures, use local variables when possible.
+// As needed add new global variables to the list below
+
+
+/* --- Initialize builtin NEURON Settings --- */
+
+secondorder=2			// sets the time integration method
+v_init = -65			// initial membrane potential
+steps_per_ms = 10		// number of points to plot per ms
+dt = 0.02				// time step of simulations (in ms)	(must be compatible with steps_per_ms)
+t = 0					// Neuron time (ms)
+tstop=500				// time (ms) that simulation stops
+realtime = 0			// real world time since simulation start (s)
+screen_update_invl= 0.1	// how often to update plots
+
+/* --- End builtin NEURON Settings --- */
+
+
+/* --- Initialize Global variables for simulations --- */
+
+verbosity = 2	// scalar. verbosity level (0-6). Sets how much to print to command line
+if (verbosity > 2) printf("Verbosity level is %g \n", verbosity)
+showGUI = 1		// boolean. whether to run "initgui.hoc" to open gui
+msplit = 0		// boolean. whether to start multisplit parallel context
+nmt = 8			// integer. number of threads to run if split (change based on system)
+LoadDependents = 0	//boolean.  unused for now (in future will test for func dependencies)
+
+e4AP = 0.90		// effectiveness of 4AP application (0 = no effect, 1 = complete block)
+eZD = 0.95		// effectiveness of ZD7288 application (0 = no effect, 1 = complete block)
+eXE = 0.95		// effectiveness of XE991 application (0 = no effect, 1 = complete block)
+tstart=0		// the time (ms into simulation) that stimulus starts
+nSection=0		// number of sections in the model
+forall nSection+=1
+
+/* --- End Global simulation variables --- */
+
+
+// ---- Global strdef (there are no local strdefs in nrn)
+strdef NRNDIR				// NRNDIR is base directory of model
+strdef DATADIR, datadir_	// DATADIR is full path of directory where simulation data is saved
+strdef subdir				// data subdirectory
+strdef strtmp, tmpstr		// tmp strings used by several procs & funcs (there are no local strdef in hoc)
+strdef datafile				// name of data file being saved
+strdef filename
+strdef AECmap
+strdef headerstr			// header at top of data file
+strdef cwd					// working directory
+strdef sect
+// ------
+
+
+// ---- Global objref
+objref StrFx			// StringFunction object 
+objref sref				// SectionRef
+objref MS_				// MechanismStandard
+objref AREAS
+objref GLS
+objref objtmp[1]
+
+
+// I use the '_G_' suffix for many global objects to decrease the chances of name conflicts
+objref idc_G_[2]			// Array of step currents (IClamp objects) used for dc holding current
+objref sp_G_[5]				// Array of sum pulses (sEPSP objects) used for summation sims
+objref cw_G_				// Chirp current (chirp object) used for ZAP measure sims
+objref simsecs_G_			// SectionList specifying sections from which to record simulation data
+objref rvec_G_[1], tvec_G_	// time and data vectors to record during simulation
+objref ivec_G_				// current vector to record
+objref gvec_G_				// conductance and state vectors to record during simulation
+objref vecList				// list of vectors (currently unused)
+RecDt = 0.2					// Sample interval (ms) for saving recorded data to file (should be multiple of dt)
+Gstep = 5					// How many time steps between measuring conductances
+// ------
+
+
+// ***** Setup input and output directory paths *****
+
+system("echo $NRNBASE", NRNDIR)	// retrieve path of local neuron simulation directory
+StrFx = new StringFunctions()
+strlen = StrFx.len(NRNDIR)
+StrFx.left(NRNDIR,strlen-1)		// remove newline character at end of string
+
+strtmp="date \"+%m%d%Y\" "
+system(strtmp,tmpstr)			// get current date
+strlen = StrFx.len(tmpstr)
+StrFx.left(tmpstr,strlen-1)	// remove newline character at end of string
+
+
+// make directory to save data
+datadir_ = "data/"				// data directory is named "data"
+sprint( DATADIR, "%s/%s%s", NRNDIR, datadir_, tmpstr )
+sprint(strtmp, "mkdir %s", DATADIR)
+system(strtmp)
+
+// ***** End Setup input and output directory paths *****
+
+
+
+
+

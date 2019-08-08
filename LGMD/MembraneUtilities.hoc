@@ -1,0 +1,273 @@
+
+
+// func isclass( objref, class name )	-	checks if object is of a given type
+	// dependency: none (stdlib and stdrun always assumed to be loaded and not listed in dependency)
+
+// proc MechList( List )	-	adds String with the name of all membrane mechanisms in cas to List
+	// dependency: none
+
+// proc getglist( List )	-	get the names of all membrane mechanisms in cas with a 'g' variable
+	// dependency: MechList (local)
+
+// func Rm( channel name(s), Rm/Gm flag )	-	returns membrane resistance or conductance
+	// dependency: MakeStringList (local), getglist (local)
+
+// func meanRm( sections, mechanism(s), Rm/Gm flag)
+	// dependency: Rm (local), MakeStringList (local), getglist (local)
+
+// proc HCNDist( strdef gradient name )	-	set the gradient of HCN distributions
+	// dependency: issplit, StopPar, StartPar (parinit); meanRm (local)
+
+
+load_file("chanAnalysis.hoc")
+
+
+proc handle_M_dist() { local D, Mhalf, MS, Mmax, Mmin, ms
+        Mmax = SIZM
+        Mmin = 1.5e-4
+        Mhalf = 150
+        MS = -75
+        
+        ms = issplit()
+        if (ms) stopPar()
+        
+        soma[0] {distance()}
+        
+        forsec "Handle" {
+        	D = distance(0.5)
+        	gmax_M = (Mmin + (Mmax-Mmin)/(1+exp((Mhalf-D)/MS)))
+        }
+
+        if (ms) startPar()
+}
+
+proc handle_Na_dist() { local D, d_half, Namax, S, Namin, ms
+        Namin = 1.0e-2
+        Namax = SIZNa
+        d_half = 120
+        S = -120
+        
+        ms = issplit()
+        if (ms) stopPar()
+
+		soma[0] {distance()}
+		
+		forsec "Handle" {
+        	D = distance(0.5)
+        	gmax_Na = (Namin + (Namax-Namin)/(1+exp((d_half-D)/S)))
+        }
+        if (ms) startPar()
+
+}
+
+/*
+proc ChannelDistanceGradient() { local Gm, iss, scale, md, grest	localobj sl, ms
+//HCNDist( sections, channel, gradient name, ... )
+
+	iss = issplit()
+	if (iss) stopPar()
+
+	if (verbosity > 2) printf( "ChannelDistanceGradient: distro = %s\n", $s2 )
+	
+	if (argtype(1)==2)	{
+		sl = new SectionList()
+		forall ifsec $s1 sl.append()
+		if (verbosity > 2) sl.printnames()
+	} else if (argtype(1)==1)	sl = $o1
+	
+	if (argtype(2)==2)	{
+		ms = new MechanismStandard($s2)
+	} else if {
+		(argtype(1)==1)	ms = $o2
+	}
+	
+	finitialize(v_init)
+	
+	ms.name(tmpstr)
+	Gm = meanRm( sl, tmpstr, 1)
+	
+	grest = Tines[0].g_hcn/Tines[0].gmax_hcn // %gmax at rest. grest = n_ncn at -65 mV
+	
+	//weighted mean of gmax = Gm/grest
+	
+	if ( strcmp("flat", $s2) == 0 ) {
+	
+		forsec sl gmax_hcn = Gm/grest
+		
+	} else if ( strcmp("increase", $s1) == 0 ) {
+		Handle[60] distance()
+		forsec FieldA gmax_hcn = 1e-4*distance(0.5)
+		init()
+		scale = Gm/meanRm(FieldA,"hcn",1)
+		forsec FieldA gmax_hcn = gmax_hcn*scale
+	} else if ( strcmp("decrease", $s1) == 0 ) {
+		Handle[60] distance()
+		forsec FieldA if (distance(0.5) > md) md = distance(0.5)
+		forsec FieldA gmax_hcn = 1e-4*( md - distance(0.5) )
+		init()
+		scale = Gm/meanRm(FieldA,"hcn",1)
+		forsec FieldA gmax_hcn = gmax_hcn*scale
+	}
+	
+	forsec FieldA gmax_KD_ca3 = 4e-3 + gmax_hcn*140
+	if (iss) startPar()
+}
+*/
+
+
+proc gvecSetup() {local gi	localobj objtmp, gvec
+// gvecSetup(gvec list, conductance/current flag)
+// 1st input is list object that the recorded vectors will be added to
+// 2nd input specifies whether to record conductance (0) or current (1)
+
+	CleanStepEvent()
+	
+// 	Hchan = new hAnalysis()
+// 	KDchan = new KDAnalysis()
+
+	if (numarg()>1) gi=$2 else gi=0
+	idc_G_[1] = new IClamp()
+	Tines[1] idc_G_[1].loc(0.5)
+	idc_G_[1].amp=0
+	
+// 	objref gvec_G_[3]
+// 	gvec_G_[0] = new Vector()
+// 	gvec_G_[0].record(idc_G_[1], &Hchan.nh)
+// 	gvec_G_[0].label("nh")
+// 	gvec_G_[1] = new Vector()
+// 	gvec_G_[1].record(idc_G_[1], &KDchan.nKD)
+// 	gvec_G_[1].label("nKD")
+// 	gvec_G_[2] = new Vector()
+// 	gvec_G_[2].record(idc_G_[1], &KDchan.lKD)
+// 	gvec_G_[2].label("lKD")
+
+	if (numarg() > 0) {
+		if (argtype(1)==1)	gvec = $o1 else gvec = gvec_G_
+	} else gvec = gvec_G_
+
+	if (SectionListCount(HList)>0) {
+		if (strcmp(Hname,"hcn") == 0) {
+			Hchan = new hcnAnalysis()
+		} else if (strcmp(Hname,"h") == 0) {
+			Hchan = new hAnalysis()
+		}
+		objtmp = new Vector()
+		if (gi==0) {
+			objtmp.record(idc_G_[1], &Hchan.nh, RecDt)
+			objtmp.label("nh")
+		} else if (gi==1) {
+			objtmp.record(idc_G_[1], &Hchan.ih, RecDt)
+			objtmp.label("Ih")
+		}
+		gvec.append(objtmp)
+	}
+	
+	if (SectionListCount(MList)>0) {
+		Mchan = new MAnalysis()
+		objtmp = new Vector()
+		if (gi==0) {
+			objtmp.record(idc_G_[1], &Mchan.nM, RecDt)
+			objtmp.label("nM")
+		} else if (gi==1) {
+			objtmp.record(idc_G_[1], &Mchan.iM, RecDt)
+			objtmp.label("IM")
+		}
+		gvec.append(objtmp)
+	}
+	
+	if (SectionListCount(KDList)>0) {
+		if (strcmp(KDname,"KD") == 0) {
+			KDchan = new KDAnalysis()
+		} else if (strcmp(KDname,"KD_ca3") == 0) {
+			KDchan = new KD3Analysis()
+		}
+		objtmp = new Vector()
+		if (gi==0) {
+			objtmp.record(idc_G_[1], &KDchan.nKD, RecDt)
+			objtmp.label("nKD")
+			gvec.append(objtmp)
+			objtmp = new Vector()
+			objtmp.record(idc_G_[1], &KDchan.lKD, RecDt)
+			objtmp.label("lKD")
+		} else if (gi==1) {
+			objtmp.record(idc_G_[1], &KDchan.iKD, RecDt)
+			objtmp.label("IKD")
+		}
+		gvec.append(objtmp)
+	}
+	
+	if (SectionListCount(KAList)>0) {
+		KAchan = new KAAnalysis()
+		objtmp = new Vector()
+		if (gi==0) {
+			objtmp.record(idc_G_[1], &KAchan.nKA, RecDt)
+			objtmp.label("nKA")
+			gvec.append(objtmp)
+			objtmp = new Vector()
+			objtmp.record(idc_G_[1], &KAchan.lKA, RecDt)
+			objtmp.label("lKA")
+		} else if (gi==1) {
+			objtmp.record(idc_G_[1], &KAchan.iKA, RecDt)
+			objtmp.label("IKA")
+		}
+		gvec.append(objtmp)
+	}
+
+	if (SectionListCount(CaTList)>0) {
+		CaTchan = new CaTAnalysis()
+		objtmp = new Vector()
+		if (gi==0) {
+			objtmp.record(idc_G_[1], &CaTchan.sCaT, RecDt)
+			objtmp.label("sCaT")
+			gvec.append(objtmp)
+	
+			objtmp = new Vector()
+			objtmp.record(idc_G_[1], &CaTchan.hCaT, RecDt)
+			objtmp.label("hCaT")
+		} else if (gi==1) {
+			objtmp.record(idc_G_[1], &CaTchan.iCaT, RecDt)
+			objtmp.label("ICaT")
+		}
+		gvec.append(objtmp)
+	}
+	
+}
+
+
+proc HCNDist() { local Gm, iss, scale, md, grest
+//HCNDist( gradient name )
+
+	iss = issplit()
+	if (iss) stopPar()
+
+	if (verbosity > 2) printf( "HCNDist: dist = %s\n", $s1 )
+
+	finitialize(v_init)
+	Gm = meanRm( FieldA, "hcn", 1)
+	
+	grest = Tines[0].g_hcn/Tines[0].gmax_hcn // %gmax at rest. grest = n_ncn at -65 mV
+	
+	//weighted mean of gmax = Gm/grest
+	
+	if ( strcmp("flat", $s1) == 0 ) {
+		forsec FieldA gmax_hcn = Gm/grest
+	} else if ( strcmp("increase", $s1) == 0 ) {
+		Handle[60] distance()
+		forsec FieldA gmax_hcn = 1e-6*distance(0.5)
+		init()
+		scale = Gm/meanRm(FieldA,"hcn",1)
+		forsec FieldA gmax_hcn = gmax_hcn*scale
+	} else if ( strcmp("decrease", $s1) == 0 ) {
+		Handle[60] distance()
+		forsec FieldA if (distance(0.5) > md) md = distance(0.5)
+		forsec FieldA gmax_hcn = 1e-6*( md - distance(0.5) )
+		init()
+		scale = Gm/meanRm(FieldA,"hcn",1)
+		forsec FieldA gmax_hcn = gmax_hcn*scale
+	}
+	
+	forsec FieldA gmax_KD_ca3 = 4e-3 + gmax_hcn*140
+	if (iss) startPar()
+}
+
+

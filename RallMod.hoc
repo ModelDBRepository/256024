@@ -1,0 +1,309 @@
+/*
+ simulations testing a simple Rall neuron with branching dendrites ability to discriminate
+ 	synaptic input synchrony.
+ simulations adapted from Migliore et. al 2004 (ModelDB: number 32992)
+
+-RBD
+*/
+
+objref model
+model = new String()
+model.s = "Rall"
+
+nBranch = 5		// number of dendritic branch levels
+nDend = 2^(nBranch+1)-1	// number of dendritic sections
+initDiam = 12	// largest dendritic diameter	(µm)
+dendL = 20		// length of dendritic branches (µm)
+Raxial = 150	// axial resistivity (Ohm-cm)
+Cm = 1			// membrane capacitance (µF/cm2)
+Gm = 1e-4		// membrane conductance (mS/cm2)
+
+create soma
+create Dendrite[nDend]
+access soma
+
+soma {
+	pt3dclear()
+	L=20
+	diam=20
+	nseg = 5
+}
+soma connect Dendrite[0](0),1
+
+proc DendConnect(){
+	b1=0
+	for i=0,nBranch-1 {
+		b2 = b1+2^i
+		for n=b1,b2-1 {
+			Dendrite[n] {
+				connect Dendrite[n*2+1](0),1
+				connect Dendrite[n*2+2](0),1
+			}
+		}
+		b1=b2
+	}
+}
+
+proc DiamMorphology() { local p
+	b1=0
+	p=$1
+	for i=0,nBranch {
+		b2 = b1+2^i
+		for n=b1,b2-1 {
+			Dendrite[n] {
+				nseg = 5
+				L = dendL
+				diam = initDiam*(2^p)^i
+			}
+		}
+		b1=b2
+	}
+}
+
+DendConnect()
+DiamMorphology(-2/3)
+
+define_shape()
+
+kam_Na=0.066
+Aam_Na=20
+dam_Na = 0
+kbm_Na=0.06
+Abm_Na=5.3
+dbm_Na = -31
+kah_Na=0.13
+Aah_Na=2.2
+dah_Na=-59
+kbh_Na=0.17
+Abh_Na=4.5
+dbh_Na=-29
+
+taumax_M = 25
+taumin_M = 4
+s1_M=11
+s2_M=-10.0
+
+e_h=-41
+el = -65
+
+zn_HH_Kdr=9.0
+t2_HH_Kdr=0.3
+vhalf_HH_Kdr = -36
+
+proc ginit() {
+
+	soma {
+		cm=Cm
+		insert Na
+		gmax_Na = 0.18
+		insert HH_Kdr
+		gmax_HH_Kdr = 0.06
+		t1_HH_Kdr=110
+		insert M
+		gmax_M = 2.2e-4
+		vhalf_M = -46
+		if (ismembrane("pas")) g_pas=0
+	}
+	forsec "Dend" {
+		if (gh==1) {
+			insert h
+			gmax_h = 6.0e-5
+			taumax_h = 300
+			insert M
+			gmax_M = 1.59e-4
+			insert pas
+			g_pas=0
+		} else {
+			uninsert h
+			uninsert M
+		}
+	}
+
+	finitialize(v_init)
+	
+	forsec "Dend" {
+		Ra=Raxial
+		cm=Cm
+		if (Zstate==0) {
+			uninsert Lpas2
+// 			insert pas
+			g_pas = Gm - Rm( 0, 1 )
+			e_pas = el
+		} else {
+			uninsert pas
+			insert Lpas2
+			g0_Lpas2 = Gm - Rm( 0, 1 )
+			e_Lpas2=el
+			pl_Lpas2 = 0.95
+			L_Lpas2 = 60
+		}
+	}
+}
+
+// ************* -----------------
+
+cvode_active(1)
+
+strdef label
+synint=100	// synaptic interval (ms)
+reps = 10	// number of times to repeat (each has a different randomization)
+ii = 0		// current rep
+nsyn =100	// number of synapses
+weight=0.2	// synaptic weight (nS)
+gh = 1		// whether dendrites have active conductances gh and gM
+
+rngseed=764	// random gen seed
+nfrac = 0	// noise fraction of synapse timing [0,1](1 is random, 0 is synchronous)
+nfd = 10	// number of noise levels (plus 1 with no noise)
+Zstate = 0	// impeedance state (0 = regular leak; 1 = inductive leak)
+SaveZ = 0	// whether to save impedance properties
+Zall = 1	// whether to measure impedance of all sections (1), or just potenital input sites (0)
+tstop=200	// end time of simulation (ms)
+
+// ginit()
+
+objref nc[nsyn], grph[2], spkrec,timevec, rsyn[nsyn], s[nsyn], rc, rd
+
+use_mcell_ran4()
+lowindex = mcell_ran4_init()
+rc = new Random()
+rc.uniform(0,nDend-1)
+rd = new Random()
+rd.uniform(0,1)
+
+// create synapse objects
+for i=0, nsyn-1 {
+	rsyn[i] = new Exp2Syn(0.5)
+	rsyn[i].e=0
+	rsyn[i].tau1 = 0.3
+	rsyn[i].tau2 = 3
+}
+
+timevec = new Vector()
+spkrec = new NetCon(&v(0.5), nil)
+spkrec.record("spkproc()")
+
+// procedure to update spike vector with each spike
+proc spkproc() {
+	stoprun = 1
+	timevec.append(t,gh,Zstate,nfrac*synint,rngseed,ii)
+	continuerun(t+1e-6)
+}
+
+// set new set of random times for synapses
+proc setsyntime() {
+	for i=0, nsyn-1 {
+		s[i] = new NetStim(0.5)
+		s[i].interval=synint// mean time between inputs
+		s[i].number = 1		// mean number of inputs (at each location)
+		s[i].start = 20		// time of first input
+		s[i].noise=nfrac		// randomness of timing (0 is not random, 1 is jitter = interval)
+		s[i].seed(rngseed+3)	// seed for rng
+		nc[i] = new NetCon(s[i],rsyn[i],0,0,weight*1e-3)
+// 		nc = new NetCon(source, target (pnt), threshold (mV), delay (ms), weight)
+	}
+}
+
+// set new set of random locations for synapses
+proc setsynloc() {local sect, seg
+
+	rc.MCellRan4(rngseed+1)
+	rd.MCellRan4(rngseed+2)
+	for i=0, nsyn-1 {
+		sect=int(rc.repick())
+		seg=rd.repick()
+		Dendrite[sect] { rsyn[i].loc(seg) }
+	}
+}
+
+// create plot to display simulations
+grph[0] = new Graph(0)
+graphList[0].append(grph[0])
+{grph[0].view(0, -70, tstop, 70, 950, 400, 800, 350)}
+grph[0].addvar("v(0.5)",1,1)
+grph[0].begin()
+grph[0].family(1)
+
+// grph[1] = new Graph(0)
+// graphList[0].append(grph[1])
+// {grph[1].view(0, 0, tstop, 2e-4, 100, 400, 800, 350)}
+// grph[1].begin()
+// grph[1].family(1)
+
+
+// run simulations
+proc runsynchro() {localobj fobj
+
+	for ii=1,reps {
+// 		active model
+		Zstate=0
+		gh=1
+		ginit()
+		grph[0].color(4)
+		label = "active_dend"
+		grph[0].label(0.65,0.75,label)
+// 		grph[1].addvar("Dendrite[0].g_pas(0.5)",1,1)
+		runc()
+		
+// 		passive model
+		gh=0
+		Zstate=0
+		ginit()
+		grph[0].color(3)
+		label = "passive_dend"
+		grph[0].label(0.65,0.8,label)
+		runc()
+		
+// 		inductive model
+		gh=0
+		Zstate=1
+		ginit()
+// 		grph[1].addvar("Dendrite[0].g_Lpas2(0.5)",1,1)
+		grph[0].color(2)
+		label = "passive_dend_Zpas"
+		grph[0].label(0.65,0.7,label)
+		runc()
+		
+		rngseed+=4
+	}
+	
+
+	// save simulation data
+	nspkval = timevec.size()
+	sprint( datafile, "%s/%s_synchro_spks_%g_%g", DATADIR, model.s, rngseed,reps)
+	fobj = new File()
+	fobj.wopen(datafile)
+	fobj.printf("Data is spike time, gh, Z state, noise tau (ms), rng seed, rep\n")
+	fobj.printf("%g spikes recorded\n", nspkval/6)
+	fobj.printf("%g values\n", nspkval)
+	n = timevec.printf(fobj, "%-1.8g\t")
+	fobj.close()
+	
+}
+
+
+proc runc() { local n,i
+
+	setsynloc()
+
+	for n=0,nfd {
+		nfrac = 1.0/nfd*n
+		setsyntime()
+		
+		run()
+	}
+	if (SaveZ==1 && ii==1) {
+		sprint(label, "%s%g_Z_%s",model.s, nBranch, label)
+		if (Zall) {
+			SaveImpedanceProfile( label, "", 50, 0, 0.2, 1, 1)
+		} else {
+			SaveImpedanceProfile( label, distlist, 50, 0, 0.2, 1, 1)
+		}
+	}
+
+}
+
+
+runsynchro()
+
+

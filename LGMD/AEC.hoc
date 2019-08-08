@@ -1,0 +1,369 @@
+filename = "/Users/richard/nrn/LGMD_model/morphology/AEC_morphology.hoc"
+// SaveParams(filename)
+strdef fname, pname
+TineBase = new SectionList()
+FindFieldBase( TineBase, "MainTrunk", "Tines" )
+
+objref fobj, TECvec, TEClist, OSL, aecfile
+
+strdef branchmap
+branchmap = "/Users/richard/nrn/LGMD_model/morphology/AEC_map.hoc"
+
+
+proc TineBranchCables() { local k,n, tf, i, j, nt	localobj sl, psec, ncsl
+
+	TECvec = new Vector(1266,-1)
+	TEClist = new List()
+	for j=0,1265 TEClist.append(new String())
+
+	OSL = new SectionList()	// SectionList of old sections
+	forsec "Tines" OSL.append()
+
+	fobj = new File()
+	tf = fobj.mktemp()
+	if (!tf) {
+		if (verbosity > 0) printf("Unable to create temp file. exiting\n")
+		return
+	}
+	if (verbosity > 1) printf("Creating AEC file %s\n", filename)
+	
+	ims = issplit()		// check if multisplit is on
+	if (ims) stopPar()	// if multisplit is on, stop it
+	
+	k=0
+	j=0
+	nt = 1
+	if (argtype(1)==0) nt = $1
+	
+	aecfile = new File(filename)
+	aecfile.wopen()
+	
+	fobj.wopen()
+	if (nt>1) {
+		ncsl = new SectionList()
+		sl = new List()
+	}
+
+	if (verbosity > 2) printf("AEC: reduced tines %gx\n", nt)
+	forsec TineBase {
+
+		if (int(k/nt)==j) {
+			sprint(fname, "Tine%d", j)
+			if (nt>1) {
+				ncsl = new SectionList()
+				sl = new List()
+				n=0
+			} else sl = new SectionList()
+			psec = new SectionRef()
+			psec.parent() { pname=secname() }
+			j+=1
+		}
+		if (nt>1) {
+			sl.append(new SectionList())
+			sl.o(n).subtree()
+			ncsl.append()
+			n+=1
+		} else sl.subtree()
+		k+=1
+		if (int(k/nt)==j) {
+			if (verbosity > 3) printf("AEC: k=%g, n=%g, j=%g\n", k,n,j)
+			if (nt>1) i = EquivCableStep(sl,ncsl) else i = EquivCableStep(sl)
+			aecfile.printf("create %s[%d]\n", fname, i)
+		}
+	}
+	aecfile.printf("nseg=1\n\n")
+	fobj.ropen()
+
+	while (i!=-1) {
+		i = fobj.gets(strtmp)
+		if (i>-1) aecfile.printf("%s", strtmp)
+	}
+	
+	fobj.unlink()
+	fobj.close()
+	
+	PrintGlobals(aecfile)
+	aecfile.close()
+
+	aecfile = new File(branchmap)
+	aecfile.wopen()
+	for i=0,TEClist.count-1 {
+		aecfile.printf("Tines[%d]\t%s[%d]\n",i,TEClist.o(i).s,TECvec.x[i])
+	}
+ 	aecfile.close()
+
+}
+// pname = "Handle[35]"
+// pname = "Handle[25]"
+
+// fobj.aopen()
+// fobj.close()
+
+proc FieldBranchCables() { local k,n, tf, i, j, nt	localobj sl, psec, ncsl, bases, names
+
+	OSL = new SectionList()	// SectionList of old sections
+	forsec FieldA OSL.append()
+	forsec "Field" OSL.append
+	n = SectionListCount(OSL)
+	
+// 	n=0
+// 	forsec FieldA n+=1
+// 	forsec "Field" n+=1
+	
+	TECvec = new Vector(n,-1)	// index of each new section (length of old sections)
+	TEClist = new List()		// list of new section names (length of old sections)
+	// for mapping, a 
+	for j=0,n-1 TEClist.append(new String())
+	
+	names = new List()	// names of new branches
+	names.append(new String("BranchA"))
+	names.append(new String("BranchB"))
+	names.append(new String("BranchC"))
+	bases = new SectionList()	// SectionList of parent sections of old branches
+	MainTrunk[0] bases.append()
+	FieldB[0] bases.append()
+	FieldC[0] bases.append()
+
+	fobj = new File()
+	tf = fobj.mktemp()
+	if (!tf) {
+		if (verbosity > 0) printf("Unable to create temp file. exiting\n")
+		return
+	}
+	if (verbosity > 1) printf("Creating AEC file %s\n", filename)
+	
+	ims = issplit()		// check if multisplit is on
+	if (ims) stopPar()	// if multisplit is on, stop it
+	
+	k=0
+	
+	aecfile = new File(filename)
+	aecfile.wopen()
+	
+	fobj.wopen()
+	sl = new List()
+	sl.append(FieldA)
+	ncsl = new SectionList()
+	forsec "FieldB" ncsl.append()
+	sl.append(ncsl)
+	ncsl = new SectionList()
+	forsec "FieldC" ncsl.append()
+	sl.append(ncsl)
+
+// 	EquivCableStep(sections, base section(s))
+
+	if (verbosity > 2) printf("AEC: reducing dendritic fields to single cables \n")
+	forsec bases {
+
+		if (verbosity > 3) printf("AEC: k=%g, n=%g\n", k,n)
+		psec = new SectionRef()
+		psec.parent() { pname=secname() }
+		fname = names.o(k).s
+		i = EquivCableStep(sl.o(k))
+		aecfile.printf("create %s[%d]\n", fname, i)
+		k+=1
+	}
+	
+	aecfile.printf("nseg=1\n\n")
+	fobj.ropen()
+
+	while (i!=-1) {
+		i = fobj.gets(strtmp)
+		if (i>-1) aecfile.printf("%s", strtmp)
+	}
+	
+	fobj.unlink()
+	fobj.close()
+	
+	PrintGlobals(aecfile)
+	aecfile.close()
+
+	aecfile = new File(branchmap)
+	aecfile.wopen()
+	i=0
+	forsec OSL {
+		aecfile.printf("%s\t%s[%d]\n",secname(),TEClist.o(i).s,TECvec.x[i])
+		i+=1
+	}
+ 	aecfile.close()
+
+}
+
+
+func EquivCableStep() { local ldc,ii,n,linc,l,f	localobj sl2, sl
+// EquivCableStep(sections, base section(s))
+// default frequency is 0, default increment is 0.04 λ
+	
+	f=0
+	linc = 0.04
+	
+	LSL = new List()
+	
+	GLS = new List()
+	MechList(GLS)
+	
+	l = linc/2
+	n=1
+
+	ldc=208
+
+	ii=0
+	sl = $o1
+	
+	if (verbosity > 2) printf("In EquivCableStep. Section %s\n", secname())
+	
+	while (n != 0) {
+		sl2 = new SectionList()
+		n=0
+		k=0
+		if (argtype(2)==1) {
+			forsec $o2 {
+				n = DistanceList(sl2,l,f,sl.o(k),linc/2)
+				k+=1
+			}
+		} else {
+			n = DistanceList(sl2,l,f,sl,linc/2)	// get equivalent diameter for each distance
+		}
+		l += linc
+	
+		if (n != 0) { 
+			PrintEquivSection(sl2,ii,linc*ldc)
+			ii+=1
+		}
+ 		
+ 	}
+
+return ii
+
+}
+
+proc PrintEquivSection() {local d,ra,j,k,any,idx,g,gn	localobj sl2, ms, S
+// PrintEquivSection( SectionList, index, section length )
+
+	d=0
+	ra=0
+	sl2 = $o1
+	idx = $2
+	gn = GLS.count()
+	S = new String()
+
+	forsec sl2 {
+// 		num = sscanf( secname(), "Tines[%i]", &j)
+// 		num = sscanf( secname(), "%[A-Za-z][%i]", strtmp, &j )
+		S.s = secname()
+		{j = SectionFind( OSL, S.s )}
+// 		n = TEClist.index(new String(secname()))
+// 		x = strcmp(TEClist.o(n).s, secname())
+		if (verbosity>3) printf("index = %g\t",j)
+		if (TECvec.x[j] == -1) {	// if section index is unassigned
+			TECvec.x[j] = idx		// assign current index
+			TEClist.remove(j)		// remove section name from list
+			TEClist.insrt(j, new String(fname))		// replace name on list
+			d+=(diam/2)^(3/2)
+		} else {
+			TECvec.x[j] = (TECvec.x[j]+idx)/2		// update assigned index
+		}
+		ra+=Ra
+	}
+	d = 2*d^(2/3)
+
+	fobj.printf("%s[%d] {\n", fname, idx)
+	if (d==0) {
+		d=1
+		fobj.printf("L = %g\n", 1 )
+		fobj.printf("Ra = 1\n")
+	} else {
+		fobj.printf("L = %g\n", $3 )
+		fobj.printf("Ra = %g\n", ra/SectionListCount(sl2) )
+	}
+	
+	if (gn==0) {
+		GLS = new List()
+		GLS.append(new String("pas"))
+	}
+	for k=0,gn-1 {	// for each conductance
+		ms = new MechanismStandard(GLS.o(k).s,1)
+		any = 0
+		forsec sl2 {	// check each compartment for the mechanism
+			if (ismembrane(GLS.o(k).s)) any=1
+		}
+		if (any==1) {
+			fobj.printf( "insert %s { ", GLS.o(k).s )
+			for j=0, ms.count()-1 {
+				size = ms.name(tmpstr, j)
+				sprint(strtmp, "tmp = %s", tmpstr)
+		
+				g=0
+				tmp=0
+				forsec sl2 {	// for each compartment at the given distance
+					if (ismembrane(GLS.o(k).s)) {
+						execute(strtmp)
+						g += tmp*area(0.5)
+					}
+				}
+				if (g>0) {
+					fobj.printf( "%s = %6g\t", tmpstr, g/sectionarea(sl2)  )
+				}
+			}
+			fobj.printf("}\n")
+		}
+	}
+	
+	fobj.printf("diam = %g\n", d)
+	fobj.printf("}\n")
+	if (idx>0) {
+		fobj.printf("%s[%d] connect %s[%d](0), 1\n\n",fname,idx-1,fname,idx)
+	} else fobj.printf("%s connect %s[0](0), 1\n", pname, fname)
+
+}
+
+proc ReplaceTines() {local ims	localobj S, mapfile, NM
+
+	ims = issplit()		// check if multisplit is on
+	if (ims) stopPar()	// if multisplit is on, stop it
+	
+	if ($2 == 1) {
+		aecfile = new File("aectemp")
+		aecfile.wopen()
+		PrintGlobals(aecfile)
+		aecfile.close()
+	}
+
+	NM = new String()
+	if (argtype(1) == 2)  {
+		sprint(NM.s, "/Users/richard/nrn/LGMD_model/morphology/%s_morphology.hoc", $s1)
+		sprint(AECmap, "/Users/richard/nrn/LGMD_model/morphology/%s_map.hoc", $s1)
+	} else {
+		NM.s = "AEC_morphology.hoc"
+		AECmap = "/Users/richard/nrn/LGMD_model/morphology/AEC_map.hoc"
+	}
+	AEC=1
+
+// 	S = new String()
+	OSL = new SectionList()
+	
+	mapfile = new File(AECmap)
+	mapfile.ropen()
+	while (flag!=-1) {
+		flag = mapfile.gets(tmpstr)
+		num = sscanf(tmpstr, "%s", sect)
+		sprint(strtmp, "%s OSL.append()", sect)
+		execute(strtmp)
+// 		OSL.append(S.s)
+	}
+	
+	forsec OSL {
+		delete_section()
+	}
+// 	FieldA.remove(OSL)
+	OSL = new SectionList()
+	define_shape()
+	
+	load_file(NM.s)
+	if ($2 == 1) {
+		load_file(1,"aectemp")
+	}
+	
+	if (ims) startPar()	// restart multisplit if it was on
+}
+

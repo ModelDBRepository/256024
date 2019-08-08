@@ -1,0 +1,145 @@
+// Morphology procedures for a branched model based on Rall's 3/2 power law
+
+
+objref model
+model = new String()
+model.s = "Rall"
+
+create soma
+access soma
+
+nBranch = 5		// number of dendritic branch levels
+nDend = 2^(nBranch+1)-1	// number of dendritic sections
+initDiam = 12	// largest dendritic diameter	(µm)
+dendL = 20		// length of dendritic branches (µm)
+
+create Dendrite[nDend]
+
+soma {
+	pt3dclear()
+	L=20
+	diam=20
+	nseg = 5
+}
+
+soma connect Dendrite[0](0),1
+
+
+proc DendConnect() {local b1, b2
+	b1=0
+	for i=0,nBranch-1 {
+		b2 = b1+2^i
+		for n=b1,b2-1 {
+			Dendrite[n] {
+				connect Dendrite[n*2+1](0),1
+				connect Dendrite[n*2+2](0),1
+			}
+		}
+		b1=b2
+	}
+}
+
+proc DiamMorphology() {local p, b1, b2
+	b1=0
+	p=$1
+	for i=0,nBranch {
+		b2 = b1+2^i
+		for n=b1,b2-1 {
+			Dendrite[n] {
+				nseg = 5
+				L = dendL
+				diam = initDiam*(2^p)^i
+			}
+		}
+		b1=b2
+	}
+}
+
+
+DendConnect()
+DiamMorphology(-2/3)
+
+define_shape()
+
+
+proc LevelDiam() {local ln, dv, mv
+// LevelDiam(level,change, multiplier or val)
+
+	ln = $1
+	dv = $2
+	mv = 0
+	if (numarg()>2) mv=$3
+	
+	b1 = 2^(ln-1)-1
+	b2 = b1+2^(ln-1)
+	for n=b1,b2-1 {
+		Dendrite[n] {
+			if (mv==1) {
+				diam(0.16) = dv
+			} else {
+				diam(0.16) = diam(0.16)*dv
+			}
+		}
+	}
+}
+
+proc LevelImpedanceTest() {local x	localobj Name
+
+	Name = new String()
+	if (numarg()>0) {
+		x=$1
+	} else {
+		x=4
+	}
+	
+	Cm=0.8
+	Raxial = 350
+
+	for i=1,5 {
+		LevelDiam(i,1/x)
+		sprint(Name.s,"Rall_L%d_%g",i, 1/x)
+		runImp(Name.s)
+		// Name.s = "Rall_areapinch"
+// 		WeightedMeanTransferImpedance(Name.s, "", 0, 1e-4, 350, 0.8)
+// 		PassiveImpedances( Name.s, "", 1e-4, 350, 0.8, 0)
+		LevelDiam(i,x^2)
+		sprint(Name.s,"Rall_L%d_%g",i, x)
+		runImp(Name.s)
+// 		WeightedMeanTransferImpedance(Name.s, "", 0, 1e-4, 350, 0.8)
+// 		PassiveImpedances( Name.s, "", 1e-4, 350, 0.8, 0)
+		LevelDiam(i,1/x)
+	}
+}
+
+
+proc PinchBranch() {local ln, dv, mv
+// PinchBranch(change, 1st branch, last branch)
+
+	if (numarg()>1)	{
+		b1 = $2
+		b2 = $3
+	} else {
+		b1 = 1
+		b2 = 63
+	}
+	dv = $1
+	
+	for n=b1,b2-1 {
+		Dendrite[n] {
+			diam(0.1) = diam(0.1)/dv
+// 			diam(0.5) = diam(0.5)*(2-1/dv)
+		}
+	}
+}
+
+Cm=0.8
+Raxial = 350
+
+proc runImp() {
+// 	sprint(model.s,"%s_%gum_%gum_%g", $s1, L*N, diam, Raxial)
+	WeightedMeanTransferImpedance($s1, "", 0, 1e-4, Raxial, Cm)
+	PassiveImpedances( $s1, "", 1e-4, Raxial, Cm, 0)
+}
+
+// CreateRall(5)
+

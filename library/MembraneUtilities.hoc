@@ -1,0 +1,925 @@
+
+
+// func isclass( objref, class name )	-	checks if object is of a given type
+	// dependency: none (stdlib and stdrun always assumed to be loaded and not listed in dependency)
+
+// proc MechList( List )	-	adds String with the name of all membrane mechanisms in cas to List
+	// dependency: none
+
+// proc getglist( List )	-	get the names of all membrane mechanisms in cas with a 'g' variable
+	// dependency: MechList (local)
+
+// func Rm( channel name(s), Rm/Gm flag )	-	returns membrane resistance or conductance
+	// dependency: MakeStringList (local), getglist (local)
+
+// func meanRm( sections, mechanism(s), Rm/Gm flag)
+	// dependency: Rm (local), MakeStringList (local), getglist (local)
+
+// proc HCNDist( strdef gradient name )	-	set the gradient of HCN distributions
+	// dependency: issplit, StopPar, StartPar (parinit); meanRm (local)
+
+
+proc add4AP() {localobj ml
+	//MechList( ml )
+	
+	forall {
+		if (ismembrane("KA")) gmax_KA = gmax_KA*(1-e4AP)
+		if (ismembrane("KD")) gmax_KD = gmax_KD*(1-e4AP)
+		if (ismembrane("KD_ca")) gmax_KD_ca = gmax_KD_ca*(1-e4AP)
+		if (ismembrane("KD_ca2")) gmax_KD_ca2 = gmax_KD_ca2*(1-e4AP)
+		if (ismembrane("KD_ca3")) gmax_KD_ca3 = gmax_KD_ca3*(1-e4AP)
+		if (ismembrane("KD_cn")) gmax_KD_cn = gmax_KD_cn*(1-e4AP)
+		if (ismembrane("KD_cn2")) gmax_KD_cn2 = gmax_KD_cn2*(1-e4AP)
+	}
+}
+proc wash4AP() {
+	forall {
+		if (ismembrane("KA")) gmax_KA = gmax_KA/(1-e4AP)
+		if (ismembrane("KD")) gmax_KD = gmax_KD/(1-e4AP)
+		if (ismembrane("KD_ca")) gmax_KD_ca = gmax_KD_ca/(1-e4AP)
+		if (ismembrane("KD_ca2")) gmax_KD_ca2 = gmax_KD_ca2/(1-e4AP)
+		if (ismembrane("KD_ca3")) gmax_KD_ca3 = gmax_KD_ca3/(1-e4AP)
+		if (ismembrane("KD_cn")) gmax_KD_cn = gmax_KD_cn/(1-e4AP)
+		if (ismembrane("KD_cn2")) gmax_KD_cn2 = gmax_KD_cn2/(1-e4AP)
+	}
+}
+proc addZD7288() {
+	forall {
+		if (ismembrane("h")) gmax_h = gmax_h*(1-eZD)
+		if (ismembrane("h_ca")) gmax_h_ca = gmax_h_ca*(1-eZD)
+		if (ismembrane("hcn")) gmax_hcn = gmax_hcn*(1-eZD)
+	}
+	if (numarg()>0) if (strcmp($s1,"axon")==0) {
+		forsec "Axon" gmax_h = gmax_h/(1-eZD)*(1-eZD/4)
+	}
+}
+proc washZD7288() {
+	forall {
+		if (ismembrane("h")) gmax_h = gmax_h/(1-eZD)
+		if (ismembrane("h_ca")) gmax_h_ca = gmax_h_ca/(1-eZD)
+		if (ismembrane("hcn")) gmax_hcn = gmax_hcn/(1-eZD)
+	}
+	if (numarg()>0) if (strcmp($s1,"axon")==0) {
+		forsec "Axon" gmax_h = gmax_h*(1-eZD)/(1-eZD/4)
+	}
+}
+proc addXE991() {
+	forall if (ismembrane("M")) gmax_M = gmax_M*(1-eXE)
+	if (numarg()>0) if (strcmp($s1,"axon")==0) {
+		forsec "Axon" gmax_M = gmax_M/(1-eXE)*(1-eXE/2)
+	}
+}
+proc washXE991() {
+	forall if (ismembrane("M")) gmax_M = gmax_M/(1-eXE)
+	if (numarg()>0) if (strcmp($s1,"axon")==0) {
+		forsec "Axon" gmax_M = gmax_M*(1-eXE)/(1-eXE/2)
+	}
+}
+
+proc makenonspiking() {
+	forall {
+		if (ismembrane("Na")) uninsert Na
+		if (ismembrane("HH_Kdr")) uninsert HH_Kdr
+		if (ismembrane("KCa")) uninsert KCa
+		if (ismembrane("CaL")) uninsert CaL
+		if (ismembrane("CaT")) uninsert CaL
+		if (ismembrane("CaS")) uninsert CaL
+		if (ismembrane("CaInternal")) uninsert CaInternal
+		if (ismembrane("CaIn")) uninsert CaInternal
+		e_pas=e_pas+3
+	}
+}
+
+
+proc MechList() { local i, cas	localobj ml, mt, strobj
+//MechList( string list, cas flag )
+// creates a list of strings with the names of all membrane mechanisms in cas or all sections
+
+	if (object_id($o1,1) == -1)	$o1 = new List()	// if object is null make a new List
+	ml = $o1
+	mt = new MechanismType(0)
+	if (numarg()>1) cas = $2	else cas = 0
+
+	for i=0,mt.count()-1 {
+		strobj = new String()
+		mt.select(i)
+		mt.selected(strobj.s)
+		if (cas) {
+			if (MechChk(strobj.s) == 1)	ml.append(strobj)
+		} else	ml.append(strobj)
+		
+	}
+}
+
+proc PPList() { local i	localobj ml, mt, strobj
+//PPList( string list, type )
+// creates a list of strings with the names of point processes in cas
+
+	if (object_id($o1,1) == -1)	$o1 = new List()	// if object is null make a new List
+	ml = $o1
+	mt = new MechanismType(1)
+// 	if (numarg()>1) cas = $2	else cas = 0
+
+	strobj = new String()
+	for i=0,mt.count()-1 {
+		mt.select(i)
+		mt.selected(strobj.s)
+		if (MechChk(strobj.s) == 1)	ml.append(strobj)
+	}
+}
+
+func MechChk() { local i,val localobj ms, strobj
+//bool = MechChk( string )
+// checks whether membrane mechanism named "string" is in current section. Returns 1 if yes, 0 if not
+
+	ms = new MechanismStandard($s1,0)
+	val = -1.314e20		// assuming no parameter will be equal to this value
+	
+	strobj = new String()
+	if (ms.count() > 0) {
+		ms.name(strobj.s,0)
+		ms.set(strobj.s,val)
+		ms.in()
+		i = (val != ms.get(strobj.s))
+	}
+	return i
+}
+
+
+proc getglist() { local i,j,flag, cas localobj glist, ms, SF
+// getglist( List, cas flag )
+// generate a list of conductance mechanisms in cas or all sections (all membrane mechs with a 'g' value)
+
+	if (numarg()>1) cas = $2	else cas = 0
+	if (object_id($o1,1) == -1)	$o1 = new List()	// if object is null make a new List
+	glist = $o1
+	MechList(glist, cas)
+	
+	SF = new StringFunctions()
+
+	for (i=glist.count()-1; i>=0; i=i-1) {
+		ms = new MechanismStandard(glist.o(i).s, 0)
+		flag=0
+		for j=0,ms.count()-1 {
+			ms.name(strtmp,j)
+			if (SF.substr(strtmp,"g_") != -1) {
+				flag=1
+			}
+		}
+		if (flag == 0) glist.remove(i)
+	}
+}
+
+
+proc getgvec() { local i,j localobj gvec, ml, ms, SF
+// getgvec( Vector, List )
+// getgvec( Vector )
+// generate vector of conductance values of all mechanisms in List. If no List given, calls
+//		MechList and uses all conductance mechanisms
+
+	gvec = $o1
+	if (numarg()>1) {
+		ml = $o2
+	} else {
+		ml = new List()
+		MechList(ml)
+	}
+	if (object_id(gvec,1) == -1) gvec=new Vector(ml.count(),0)
+	
+	SF = new StringFunctions()
+
+	for i=0,ml.count()-1 {
+		ms = new MechanismStandard(ml.o(i).s, 0)
+		for j=0,ms.count()-1 {
+			ms.name(strtmp,j)
+			if (SF.substr(strtmp,"g_") != -1) {
+				gvec.x[i]=1
+			}
+		}
+	}
+}
+
+func IsoEquivAmp() {local mGm,mCm,tw,ta,rca,mR	localobj SL
+// amp = IsoEquivAmp(f,SL)
+// calculate an isopotential impedance amplitude (Mohm) for frequency f (Hz).
+// Optionally specify a subset of sections to use (SL)
+
+	if ((numarg()==0) || (argtype(1)>0)) {
+		if (verbosity > 1) printf("IsoEquivAmp: 1st argin must be frequency (Hz)\n")
+		return(-1)
+	}
+	
+	SL = new SectionList()
+	if (numarg()>1) {
+		if (argtype(2)==1) { SL = $o2
+		} else if (argtype(2)==2) { forsec $s2 SL.append()
+		}
+	} else {
+		forall SL.append()
+	}
+	
+	ta= totalarea()		// total surface area (µm2)
+	mGm = meanRm(SL,0,1)	//mean membrane conductance (S/cm2)
+	mCm = 0
+	forsec SL {
+		mCm+=cm*1e-6*area(0.5)/ta	//mean membrane capacitance (F/cm2)
+	}
+	tw = 2*PI*$1*mCm/mGm	// rad•s
+	mR = 1e-6*1e8/ta/mGm		// mean resistance (Mohm; Mohm/ohm*µm2/cm2/µm2/(S/cm2) )
+	rca = mR/(1+tw^2)^0.5	// amplitude (Mohm) of isopotential cell
+
+	return(rca)
+}
+
+func IsoEquivPhase() {local mGm,mCm,tw,ta,rcp	localobj SL
+// amp = IsoEquivAmp(f,SL)
+// calculate an isopotential impedance phase (°) for frequency f (Hz).
+// Optionally specify a subset of sections to use (SL)
+
+	if ((numarg()==0) || (argtype(1)>0)) {
+		if (verbosity > 1) printf("IsoEquivAmp: 1st argin must be frequency (Hz)\n")
+		return(-1)
+	}
+	
+	SL = new SectionList()
+	if (numarg()>1) {
+		if (argtype(2)==1) { SL = $o2
+		} else if (argtype(2)==2) { forsec $s2 SL.append()
+		}
+	} else {
+		forall SL.append()
+	}
+	
+	ta = totalarea()		// total surface area (µm2)
+	mGm = meanRm(SL,0,1)	//mean membrane conductance (S/cm2)
+	mCm = 0
+	forsec SL {
+		mCm+=cm*1e-6*area(0.5)/ta	//mean membrane capacitance (F/cm2)
+	}
+	tw = 2*PI*$1*mCm/mGm	// rad•s
+	rcp = atan(-tw)*180/PI	// phase (°) of isopotential equivalent cell
+
+	return(rcp)
+}
+
+proc MakePassive() {local i,Gsum,argn,vi	localobj sl, gls
+
+	argn = numarg()
+	vi = v_init
+	
+	if (verbosity > 3) for i=1,argn print argtype(i)
+
+	if (argn > 1) {
+		vi = $2
+	} else if (argn > 0) {
+		if (argtype(1)==2)	{
+			sl = new SectionList()
+			forall ifsec $s1 sl.append()
+			if (verbosity > 4) sl.printnames()
+		} else if (argtype(1)==1)	sl = $o1
+	} else {
+		sl = new SectionList()
+		sl.append()
+	}
+	
+	init(v_init)
+
+	forsec sl {
+		gls = new List()
+		getglist(gls,1)
+
+		for (x,0) {
+			RmGtot=0
+			for i=0,gls.count()-1 {
+				if (ismembrane(gls.o(i).s)) {
+					sprint( strtmp, "RmGtot += g_%s", gls.o(i).s)
+					execute(strtmp)
+					sprint( strtmp, "uninsert %s", gls.o(i).s)
+					execute(strtmp)
+				}
+			}
+			insert pas
+			g_pas = RmGtot
+			e_pas = vi
+		}
+	}
+
+}
+
+func Rm() { local i,flag localobj gls
+// val = Rm( strdef channel name )
+// val = Rm( List channel name(s) )
+// val = Rm( channel name(s), Rm/Gm flag )
+// val = Rm( 0, Rm/Gm flag )
+// measure membrane resistivity megaohm*cm^2 (flag == 0) or conductivity S/cm^2 (flag == 1)
+
+	flag = 0
+	RmGtot=0
+
+	if (numarg() > 0) {
+		if (argtype(1) == 1) {
+			gls = $o1
+		} else if (argtype(1)==2) {
+			gls = new List()
+			MakeStringList(gls,$s1)
+		} else if (argtype(1)==0) {
+			gls = new List()
+			getglist(gls)
+		}
+	} else {
+		gls = new List()
+		getglist(gls)
+	}
+	
+	if (numarg() > 1) flag = $2
+	
+	for i=0,gls.count()-1 {
+		if (ismembrane(gls.o(i).s)) {
+			sprint( strtmp, "RmGtot += g_%s", gls.o(i).s)
+			//if (verbosity > 3) printf("%s", strtmp)
+			execute(strtmp)
+		}
+	}
+	if (flag ==1) {
+		return RmGtot
+	} else {
+		if (RmGtot == 0) return 1e30 else return 1e-3/RmGtot
+	}
+}
+
+
+func sum_state() { local err
+// sum = sum_state( SectionList, strdef )
+
+	Ssum=0
+	err=-1
+	sprint( strtmp, "Ssum += %s*area(0.5)", $s2)
+	forsec $o1 {
+		if (err==-1) {
+			err = execute1(strtmp)
+			if (err==0) return -1
+		} else execute(strtmp)
+	}
+	return Ssum
+}
+
+func meanRm() { local argn,i,flag, Asum,Gsum localobj gls, sl
+// val = meanRm( sections, mechanism(s), Rm/Gm flag)
+// 'sections' can be a SectionList or string specifying sections to measure
+// 'mechanisms' can be a List of membrane mechanisms, a string with name of mechanism, or 
+// 		else a list of all membrane mechanisms is generated
+// if Rm/Gm flag == 1 returms mean membrane conductivity (S/cm^2).
+// measure membrane resistivity megaohm*cm^2 (flag == 0) or conductivity S/cm^2 (flag == 1)
+
+	flag = 0
+	Gsum=0
+	Asum = 0
+	argn = numarg()
+	
+	if (verbosity > 3) for i=1,argn print argtype(i)
+
+	if (argn >= 1) {
+		if (argtype(1)==2)	{
+			sl = new SectionList()
+			forall ifsec $s1 sl.append()
+			if (verbosity > 4) sl.printnames()
+		} else if (argtype(1)==1)	sl = $o1
+	} else {
+		if (verbosity > 1) printf("Must give at least 1 input arg: meanRm\n")
+		return -1
+	}
+
+	if (argn >= 2) {
+		if (argtype(2)==1) {
+			gls = $o2
+		} else if (argtype(2)==2) {
+			gls = new List()
+			MakeStringList(gls,$s2)
+		} else if (argtype(2)==0) {
+			gls = new List()
+			getglist(gls)
+		}
+	} else {
+		gls = new List()
+		getglist(gls)
+	}
+	
+	if ((argn >= 3) && (argtype(3)==0) ) flag = $3
+
+	if ( SectionListCount(sl) == 0 )	return -1
+	
+	if (object_id(sl) != 0) {
+		forsec sl for (x,0) {
+			Asum += area(x)				// µm2
+			Gsum += Rm(gls,1)*area(x)	// S/cm2*µm2 = S*10^-8
+		}
+	} else {
+		forall for (x,0) {
+			Asum += area(x)				// µm2
+			Gsum += Rm(gls,1)*area(x)	// S/cm2*µm2 = S*10^-8
+		}
+	}
+
+	if (flag ==1) {
+		return Gsum/Asum		// S/cm2
+	} else {
+		if (Gsum == 0) return 1e30 else return Asum*1e-3/Gsum	// MΩ•cm2
+	}
+}
+
+
+obfunc getchan() { local i,flag localobj glist, ms, SF
+// mech = getchan( strdef )
+// generate a list of conductance mechanisms in section (all membrane mechs with a 'g' value)
+
+	glist = new List()	// if object is null make a new List
+	MechList(glist)
+	
+	SF = new StringFunctions()
+
+	for (i=glist.count()-1; i>=0; i=i-1) {
+		if (SF.substr( glist.o(i).s, $s1) != -1) {
+			ms = new MechanismStandard( glist.o(i).s, 0)
+			flag=1
+		}
+	}
+	return ms
+}
+
+
+func meanCaI() { local argn,i, A,ci localobj sl
+	//meanCaI( sections )
+
+	ci= 0
+	A = 0
+	argn = numarg()
+	
+	if (verbosity > 3) for i=1,argn print argtype(i)
+
+	if (argn >= 1) {
+		if (argtype(1)==2)	{
+			sl = new SectionList()
+			forall ifsec $s1 sl.append()
+			if (verbosity > 2) sl.printnames()
+		} else if (argtype(1)==1)	sl = $o1
+	}
+	
+	if (object_id(sl) != 0) {
+		forsec sl for (x,0) {
+			if (ismembrane("ca_ion")) {
+				A += area(x)
+				ci += cai*area(x)
+			}
+		}
+	} else {
+		forall for (x,0) {
+			if (ismembrane("ca_ion")) {
+				A += area(x)
+				ci += cai*area(x)
+			}
+		}
+	}
+
+	return ci/A
+}
+
+func ri2() {local val,i	localobj sref
+// val = ri2( void )
+// measures the sum axial resistance (MΩ) between cas and its adjacent section
+
+	val=0
+	
+	sref = new SectionRef()
+	if (sref.has_parent()) val=ri(0.5)
+	for i= 0,sref.nchild-1 {
+		sref.child[i] val+=ri(0.5)
+	}
+}
+
+func lambda() { local val, rm
+
+	if (numarg() > 0) rm = $1 else rm = Rm()
+	val = 0.5*(diam*rm/Ra)^0.5
+
+	return val
+}
+
+proc swapchans() {local g
+	// swapchans( channel name1, channel name2 )
+	// swap chans replaces one conductance with another maintaining gmax in each section
+	
+	forall {
+		strtmp = $s1
+		if (ismembrane(strtmp)) {
+			sprint(tmpstr, "g = gmax_%s", strtmp)
+			execute(tmpstr)
+			sprint(tmpstr, "uninsert %s", strtmp)
+			execute(tmpstr)
+			strtmp = $s2
+			sprint(tmpstr, "insert %s", strtmp)
+			execute(tmpstr)
+			sprint(tmpstr, "gmax_%s = g", strtmp)
+			execute(tmpstr)
+		}
+	}
+
+}
+
+proc ZratioRa() { local zf,rmax,strobj,up localobj zz, sl, sref
+// ZratioRa(section list, init section, peak Ra, frequency, increase/decrease)
+
+zf=10
+rmax=300
+up=0
+
+finitialize(v_init)
+
+if (argtype(1)==2)	{
+	sl = new SectionList()
+	forall ifsec $s1 sl.append()
+	if (verbosity > 2) sl.printnames()
+} else if (argtype(1)==1)	sl = $o1
+
+if (numarg()>1) {
+	if (argtype(2)==2)	{
+		sprint(tmpstr, "%s sref = new SectionRef()", $s2)
+		if (verbosity > 2) printf("%s\n", tmpstr)
+		execute(tmpstr)
+	}
+	if (argtype(2)==1)	sref = $o2
+} else sref = new SectionRef()
+if (numarg()>2) rmax = $3
+if (numarg()>3) zf = $4
+if (numarg()>4) up = $5
+
+	//if (msplit) stopPar()
+
+	zz = new Impedance()
+	sref.sec { zz.loc(0.5) }
+	zz.compute(zf)
+	forsec sl {
+		if (up==0) Ra=rmax*zz.ratio(0.5)
+		if (up>0) Ra=rmax/zz.ratio(0.5)
+	}
+	
+	//if (msplit) load_file(1,"initpar.hoc")
+
+}
+
+obfunc Zmap() {local zf,pwr,in,i localobj zz, chan, sl, map, sref
+// Zmap(section list, init section, frequency, pwr, in/out)
+
+zf=0
+pwr=1
+in=0
+i=0
+
+finitialize(v_init)
+
+if (argtype(1)==2)	{
+	sl = new SectionList()
+	forall ifsec $s1 sl.append()
+	if (verbosity > 2) sl.printnames()
+} else if (argtype(1)==1)	sl = $o1
+
+if (numarg()>1) {
+	if (argtype(2)==2)	{
+		sprint(tmpstr, "%s sref = new SectionRef()", $s2)
+		if (verbosity > 2) printf("%s\n", tmpstr)
+		execute(tmpstr)
+	}
+	if (argtype(2)==1)	sref = $o2
+} else sref = new SectionRef()
+if (numarg()>2) zf = $3
+if (numarg()>3) pwr = $4
+if (numarg()>4) in = $5
+
+forsec sl i+=1
+map = new Vector(i)
+zz = new Impedance()
+if (verbosity > 3) printf("%g\n", map.size())
+
+if (in == 1) {
+	sref.sec { zz.loc(0.5) }
+	zz.compute(zf)
+	i=0
+	forsec sl {
+		map.x[i]=zz.ratio(0.5)^pwr
+		i+=1
+	}
+} else {
+	i=0
+	forsec sl {
+		zz.loc(0.5)
+		zz.compute(zf)
+		sref.sec map.x[i]=zz.ratio(0.5)^pwr
+		i+=1
+	}
+}
+
+return map
+
+}
+
+proc ZDirect_g() { local argn,zf,grel,reps,pwr,g,zo,i,max,glim	 localobj z1, z2, chan, sl
+// ZDirect_g( section list, ref section, chan, grel, frequency, reps,pwr,glim,max change)
+
+zf=0
+grel=1e-5
+reps=0
+pwr=1
+max=1e2
+glim=1
+
+finitialize(v_init)
+
+argn=numarg()
+chan = new String()
+if (argtype(1)==2)	{
+	sl = new SectionList()
+	forall ifsec $s1 sl.append()
+	if (verbosity > 2) sl.printnames()
+} else if (argtype(1)==1)	sl = $o1
+
+if (argn>1) {
+	if (argtype(2)==2)	{
+		sprint(tmpstr, "%s sref = new SectionRef()", $s2)
+		if (verbosity > 2) printf("%s\n", tmpstr)
+		execute(tmpstr)
+	}
+	if (argtype(2)==1)	sref = $o2
+} else sref = new SectionRef()
+if (argn>2) {
+	if (argtype(3)==2)	chan.s = $s3
+	if (argtype(3)==1)	chan = $o3
+}
+if (argn>3) grel =$4
+if (argn>4) zf = $5
+if (argn>5) reps =$6
+if (argn>6) pwr = $7
+if (argn>7) glim =$8
+if (argn>8) max = $9
+
+for i=0,reps {
+	z1 = new Impedance()
+	z2 = new Impedance()
+	sref.sec { z1.loc(0.5) }
+	z1.compute(zf)
+	forsec sl {
+		if (ismembrane(chan.s)) {
+			z2.loc(0.5)
+			z2.compute(zf)
+			
+			sref.sec zo = z2.ratio(0.5)
+			if (grel == 0) {
+				sprint(tmpstr, "val = gmax_%s", chan.s)
+				execute(tmpstr)
+				g = val+max*val*(zo-z1.ratio(0.5)^pwr)
+			} else g = grel+max*grel*(zo-z1.ratio(0.5)^pwr)
+			if (verbosity > 3) printf("%g", g)
+			if (g<1e-9) g=0
+			if (g>glim) g=glim
+			sprint(tmpstr, "gmax_%s = %g", chan.s, g)
+			execute(tmpstr)
+		}
+	}
+}
+}
+
+proc Zratio_g() { local zf,grel,up,pwr,max,g localobj zz, chan, sl
+// Zratio_g( section list, init section, chan, grel, frequency, increase/decrease, pwr, max )
+// 
+// sets conductance within sections based on the ratio of impedance between that section 
+// and a reference location
+
+zf=100
+grel=1e-5
+up=1
+pwr=1
+max=1
+
+finitialize(v_init)
+
+chan = new String()
+if (argtype(1)==2)	{
+	sl = new SectionList()
+	forall ifsec $s1 sl.append()
+	if (verbosity > 3) sl.printnames()
+} else if (argtype(1)==1)	sl = $o1
+
+if (numarg()>1) {
+	if (argtype(2)==2)	{
+		sprint(tmpstr, "%s sref = new SectionRef()", $s2)
+		if (verbosity > 2) printf("%s\n", tmpstr)
+		execute(tmpstr)
+	}
+	if (argtype(2)==1)	sref = $o2
+} else sref = new SectionRef()
+if (numarg()>2) {
+	if (argtype(3)==2)	chan.s = $s3
+	if (argtype(3)==1)	chan = $o3
+	if (verbosity > 2) printf("%s\n", chan.s)
+}
+if (numarg()>3) grel = $4
+if (numarg()>4) zf = $5
+if (numarg()>5) up = $6
+if (numarg()>6) pwr = $7
+if (numarg()>7) max = $8
+
+	//if (msplit) stopPar()
+	
+	if (verbosity > 2) printf("grel = %g\tzf = %g\tup = %g\tpwr = %g\tmax = %g\n", grel,zf,up,pwr,max)
+
+	zz = new Impedance()
+	sref.sec { zz.loc(0.5) }
+	zz.compute(zf)
+	forsec sl {
+		if (ismembrane(chan.s)) {
+			
+			if (grel == 0) {
+				if (strcmp(chan.s, "pas") ==0) { sprint(tmpstr, "val = g_%s", chan.s)
+				} else sprint(tmpstr, "val = gmax_%s", chan.s)
+				execute(tmpstr)
+			} else val = grel
+
+			if (up==0) {
+				g = val*zz.ratio(0.5)^pwr
+				if (g>max) g=max
+				if (strcmp(chan.s, "pas") ==0) { sprint(tmpstr, "g_pas = %g", g)
+				} else sprint(tmpstr, "gmax_%s = %g", chan.s, g)
+			}
+			if (up>0) {
+				g = val/zz.ratio(0.5)^pwr
+				if (g>max) g=max
+				if (strcmp(chan.s, "pas") ==0) { sprint(tmpstr, "g_pas = %g", g)
+				} else sprint(tmpstr, "gmax_%s = %g", chan.s, g)
+			}
+			execute(tmpstr)
+		}
+	}
+}
+
+
+proc ImpedanceMeasure() { local n,i,j,nsect,nVm,atmp,rtmp,ztmp,zf  localobj savdata,sections,Atot,Zin,rax,Vms,zz
+//ImpedanceMeasure(filename,sections,Vm vector,frequency)
+// calculates the surface area weighted average input impedance for specified sections at different Vm and freq
+// siz, handle, maintrunk, tines, field B, Ctines, Chandle, axon, cell
+
+n = numarg()
+filename = $s1
+sections = $o2
+Vms = $o3
+zf=0
+if (n>3) zf = $4
+
+nVm = Vms.size()
+nsect = sections.size()
+
+Atot = new Vector(nsect+1)
+rax = new Vector(nsect+1)
+
+atmp=0
+ztmp=0
+
+savdata = new File()
+savdata.wopen(filename)
+
+savdata.printf( "Measured impedance at %d membrane potentials for %d sections\n", nVm, nsect)
+savdata.printf( "Sections:\t")
+
+stopPar()
+
+for i=0,nVm-1 {
+
+	Zin = new Vector(nsect+1)
+	
+	finitialize(Vms.x[i])
+
+	zz = new Impedance()
+	zz.loc(0.5)
+	zz.compute(zf)
+
+	for j=0,nsect-1 {
+
+		rtmp=0
+		if ( isclass(sections.o(j), "SectionList") ) {
+			if (i==0) savdata.printf( "%s\t", sections.o(j) )
+			forsec sections.o(j) {
+				sa=area(0.5)
+				if (i==0) {
+					atmp += sa
+					rtmp += sa*Ra
+				}
+				ztmp += sa*zz.input(0.5)
+			}
+		} else if ( isclass(sections.o(j), "String") ) {
+			if (i==0) savdata.printf( "%s\t", sections.o(j).s )
+			forsec sections.o(j).s {
+				sa=area(0.5)
+				if (i==0) {
+					atmp += sa
+					rtmp += sa*Ra
+				}
+				ztmp += sa*zz.input(0.5)
+			}
+		}
+		if (i==0) {
+			Atot.x[j]=atmp
+			rax.x[j]=rtmp/atmp
+		}	
+		Zin.x[j]=ztmp/atmp
+	}
+
+	j=nsect
+	atmp = totalarea()
+	ztmp=0
+	rtmp=0
+	forall {
+		ztmp += area(0.5)*zz.input(0.5)
+		rtmp += area(0.5)*Ra
+	}
+	
+	if (i==0) {
+		Atot.x[j]=atmp
+		rax.x[j]=rtmp/atmp
+	}
+	Zin.x[j]=ztmp/atmp
+	
+	if (i==0) {
+		savdata.printf( "all\n" )
+		savdata.printf( "Area (cm^2):\t")
+		Atot.printf(savdata,"%g\t")
+		savdata.printf( "\n" )
+		savdata.printf( "Ra (Ωcm):\t")
+		rax.printf(savdata, "%g\t")
+		savdata.printf( "\n" )
+	}
+	savdata.printf( "\nVm = %g\n",  Vms.x[i])
+	savdata.printf( "Z(%g) (MΩ):\t", zf)
+	Zin.printf(savdata, "%g\t")
+	savdata.printf( "\n" )
+	//rvec.vwrite(savdata,4)
+}
+savdata.close()
+
+//chdir(cwd)
+}
+
+func meanVatt() { local n,Vm,lz,ztmp,zf,ms,dir  localobj sl,zz, sref
+//val = meanVatt(section list, Vm, frequency, direction)
+//MainTrunk[0] val = meanVatt(FieldA, -65, 0, 0)
+
+	n = numarg()
+
+	if (n >= 1) {
+		if (argtype(1)==2)	{
+			sl = new SectionList()
+			forall ifsec $s1 sl.append()
+			if (verbosity > 4) sl.printnames()
+		} else if (argtype(1)==1)	sl = $o1
+	} else {
+		if (verbosity > 1) printf("Must give at least 1 input arg: meanVatt\n")
+		return -1
+	}
+
+	if (n>1) Vm = $2 else Vm=v_init
+	if (n>2) zf = $3 else zf=0
+	if (n>3) dir = $4 else dir=0
+
+	ztmp=0
+
+	ms = issplit()
+	if (ms) stopPar()
+
+	finitialize(Vm)
+
+	sa = sectionarea(sl)
+	
+	zz = new Impedance()
+	if (dir==1) {
+		zz.loc(0.5)
+		zz.compute(zf)
+
+		forsec sl {
+			ztmp += area(0.5)*zz.ratio(0.5)
+		}
+	} else if (dir==0) {
+	
+		sref = new SectionRef()
+		
+		forsec sl {
+			zz.loc(0.5)
+			zz.compute(zf)
+			
+			sref.sec { lz = zz.ratio(0.5) }
+			ztmp += area(0.5)*lz
+		}
+	}
+
+	mva = ztmp/sa
+
+	if (ms) startPar()
+	
+	return mva
+}
+

@@ -1,0 +1,725 @@
+
+// func	area = totalarea( void )	-	returns total surface area of cell
+	// dependency: none (stdlib and stdrun always assumed to be loaded and not listed in dependency)
+	
+// func	area = sectionarea( SectionList )	-	returns total surface area of sections in list
+	// dependency: none
+
+// proc FineEnds( SectionList, sections )	-	adds all end of branch sections to SectionList
+	// dependency: none
+
+// proc FineFieldBase( SectionList, sections, sections )	-	adds sections connecting sections to SectionList
+	// dependency: none
+
+// proc FindBranches( SectionList1, SectionList2, sections )	-	adds all parent and children of branch points to SectionLists
+	// dependency: none
+
+// proc BranchLists( SectionList, sections)	-	generate a List of SectionLists for every branch in sections
+	// dependency: none
+
+
+// proc DistanceMap( Vector, reference section)	- generate a vector of distances from refence point for every segment
+	// dependency: none
+
+
+func totalarea() { local sum
+// area = totalarea( )
+// calculate total surface area of all compartments (µm2)
+//   finitialize()
+  sum = 0
+  forall for (x,0) sum += area(x)
+  return sum
+//  print "total surface area = ", sum, " um2"
+}
+
+
+func totalvolume() { local sum
+// vol = totalvolume( )
+// calculate total volume of all compartments (µm3)
+
+  sum = 0
+  forall for (x,0) sum += pi*(diam(x)/2)^2*L(x)
+  return sum
+}
+
+
+// func SectionArea() {local sum
+// // area = SectionArea( Sectionlist )
+// 	sum = 0
+// 	forsec $o1 for (x,0) sum += area(x)
+// 	return sum
+// }
+
+func TotalLength() {local sum
+// area = TotalLength()
+	sum = 0
+	forall sum += L
+	return sum
+}
+
+func sectionarea() { local sum localobj sl
+// area = sectionarea( Sectionlist )
+// area = sectionarea( string )
+// calculate total surface area (µm2) of all compartments within sectionlist
+	finitialize()
+	sum = 0
+
+	if (argtype(1)==2)	{
+		sl = new SectionList()
+		forall ifsec $s1 sl.append()
+		if (verbosity > 2) sl.printnames()
+	} else if (argtype(1)==1)	sl = $o1
+
+	forsec sl for (x,0) sum += area(x)
+	return sum
+//  print "total surface area = ", sum, " um2"
+}
+
+
+proc FindEnds() { local count	localobj sl, sref, chksecs
+// FineEnds( SectionList )
+// if no input argument finds branch ends for entire neuron
+// FineEnds( SectionList, SectionList2 )
+// finds the end compartment of every branch within SectionList2.
+// FineEnds( SectionList, string )
+// finds the end compartment of every branch within compartments specified by ifsec string.
+// 
+
+	count = numarg()
+	sl = $o1
+	if (isclass(sl,"NULLobject")) sl = new SectionList()
+
+	if (count > 1) {
+		if (argtype(2)==2)	{
+			chksecs = new SectionList()
+			forall ifsec $s2 chksecs.append()
+			if (verbosity > 3) chksecs.printnames()
+		} else if (argtype(2)==1)	chksecs = $o2
+
+		forsec chksecs {
+			sref = new SectionRef()
+			if (sref.nchild==0) {
+				sl.append()
+			}
+		}
+
+	} else {
+		forall {
+			sref = new SectionRef()
+			if (sref.nchild==0) {
+				sl.append()
+			}
+		}
+	}
+
+	
+}
+
+proc FindFieldBase() { local ims	localobj sl, pars, childs, sref
+// FineFieldBase( sectionlist, parent sections, child sections )
+// finds the base compartment(s) of every branch within child sections that are connected to 
+// parent sections
+
+	ims = issplit()		// check if multisplit is on
+	if (ims) stopPar()	// if multisplit is on, stop it so ModelView contains only 1 cell
+
+	sl = $o1
+	if (isclass(sl,"NULLobject")) sl = new SectionList()
+
+	if (argtype(2)==2)	{
+		pars = new SectionList()
+		forall ifsec $s2 pars.append()
+		if (verbosity > 3) pars.printnames()
+	} else if (argtype(2)==1)	pars = $o2
+
+	if (argtype(3)==2)	{
+		childs = new SectionList()
+		forall ifsec $s3 childs.append()
+		if (verbosity > 3) childs.printnames()
+	} else if (argtype(3)==1)	childs = $o3
+	
+	forsec childs {
+		sref = new SectionRef()
+		sref.parent() { 
+			ifsec pars { sref.sec() sl.append() }
+		}
+	}
+
+	if (ims) startPar()		// restart parallelization if needed
+
+}
+
+
+proc FindBranches() { local count 	localobj psl, csl, regsl, sref
+// FindBranches( parent SectionList, child SectionList, section pool)
+// find all branch points and add parent sections to $o1 and add all children sections to $o2
+
+	count = numarg()
+	psl = $o1
+	if (isclass(psl,"NULLobject")) psl = new SectionList()
+
+	csl = $o2
+	if (isclass(csl,"NULLobject")) csl = new SectionList()
+
+	if (count > 2) {
+		if (argtype(3)==2)	{
+			regsl = new SectionList()
+			forall ifsec $s3 regsl.append()
+			if (verbosity > 3) regsl.printnames()
+		} else if (argtype(3)==1)	regsl = $o3
+
+		forall {
+			ifsec regsl {
+				sref = new SectionRef()
+				if ( sref.has_parent() && sref.nchild>1) {
+					psl.append()
+					for i=0,sref.nchild-1 sref.child[i] { csl.append() }
+				}
+			}
+		}
+
+	} else {
+	
+		forall {
+			sref = new SectionRef()
+			if ( sref.has_parent() && sref.nchild>1) {
+				psl.append()
+				for i=0,sref.nchild-1 sref.child[i] { csl.append() }
+			}
+		}
+	}
+}
+
+
+proc BranchLists() { local count 	localobj psl, sl, bs, sref
+// BranchLists( list, section pool)
+// generate a list of SectionLists, one for each branch
+	
+	count = numarg()
+	psl = $o1
+	if (isclass(psl,"NULLobject")) psl = new List()
+	
+	bs = new SectionList()
+	
+	if (count > 1) {
+		if (argtype(2)==2)	{
+			sl = new SectionList()
+			forall ifsec $s2 sl.append()
+			if (verbosity > 2) sl.printnames()
+		} else if (argtype(2)==1)	sl = $o2
+	}
+
+	if (object_id(sl) != 0) {
+		forsec sl {
+			bs.append()
+			sref = new SectionRef()
+			if ( sref.has_parent() && sref.nchild>1) {
+				psl.append(bs)
+				bs = new SectionList()
+			}
+		}
+	} else {
+		forall {
+			bs.append()
+			sref = new SectionRef()
+			if ( sref.has_parent() && sref.nchild>1) {
+				psl.append(bs)
+				bs = new SectionList()
+			}
+		}
+	}
+}
+
+proc ReplaceMorphology() {localobj sl
+
+	ims = issplit()		// check if multisplit is on
+	if (ims) stopPar()	// if multisplit is on, stop it
+
+	forall {
+		delete_section()
+	}
+
+	sl = new SectionList()
+	if (argtype(1) == 2)  {
+		load_file(1,$s1)
+	} else {
+	}
+	
+	if (ims) startPar()
+}
+
+proc DistanceMap() {	localobj psl
+// DistanceMap( Vector, reference section)
+
+	if (isclass($o1,"NULLobject")) psl = new Vector()
+
+
+}
+
+func DistanceArea() { local sum,i,c,min,max,I
+// func DistanceArea( distance )
+// return membrane area of a given section within distance $1 from origin
+
+  	sum = 0
+  	min = distance(0)
+  	max = distance(1)
+	if (min>$1)	return 0	/* completely out */
+  	if (max<$1){ 	 /* completely in */
+	  	for (x,0) sum += area(x)	return sum
+	}
+	/* in between */
+	if (nseg==1) {
+		return area(0.5)*($1-min)/L		// section area * percent length 
+	}
+	
+	for i=1,nseg {				// loop through each segment
+		max = distance(i/nseg)	// distance to segment end
+		c = (i-0.5)/nseg		// segment middle
+		if (max<$1) {			// if whole segment and beyond included
+			sum += area(c)
+		} else if (max==$1) {	// if exactly this segment included
+			sum += area(c)
+			return sum
+		} if (max>$1) {			// if partial segment included
+			min = distance((i-1)/nseg)
+			sum += area(c)*($1-min)/L*nseg
+			return sum
+		}
+	}
+}
+
+func DistanceDiam() {   local nosec,zl,zd,mx,mn,direct	localobj sl, diamvec, imp
+// diameter = DistanceDiam( distance, frequency, SectionList )
+// calculate Rall equivalent sum of diams for sections at dist $1 from cas
+// if there is a second input argument, then $1 is treated as electrotonic distance (units of λ),
+//		otherwise $1 is the distance (in µm) along the neurite path.
+// $2 sets the signal frequency for measuring electrotonic distance
+// if a sectionlist is given for $o3, only those sections are included, otherwise all sections are used
+
+	diamvec = new Vector()
+
+	if (numarg()>1) {
+		if (argtype(2)==0) zl=1 else zl=0
+	} else zl=0 
+
+	strtmp = "micron"	// µm ('µ' isn't printable to stdout)
+	if (zl!=0) {
+		imp = new Impedance()
+		imp.loc(0)
+		imp.compute($2)
+		zd = exp(-1*$1)
+		strtmp = "lambda"	// λ ('λ' isn't printable)
+	}
+	
+	if (verbosity > 2) printf("Calculating equiv diameter at distance %g %s\n", $1, strtmp)
+	
+	if (numarg()>2) {
+		if (argtype(3)==2)	{
+			sl = new SectionList()
+			forall ifsec $s3 sl.append()
+			if (verbosity > 3) sl.printnames()
+		} else if (argtype(3)==1)	sl = $o3
+	} else forall sl.append()
+
+	distance()
+
+	forsec sl {
+		if (zl==0) {
+			if (distance(1)>distance(0)) {
+				mx=distance(1)		// maximum distance
+				mn=distance(0)		// minimum distance
+			} else {
+				mx=distance(0)
+				mn=distance(1)
+			}
+			if ((mx>=$1) && (mn<$1) ) {
+				if (verbosity > 4) printf("DistanceDiam: Distance = %g %s. distance is %g to %g\n", \
+					$1, strtmp, mn, mx)
+				if (L==0) {
+					diamvec.append(diam(0.5))
+					if (verbosity > 1) printf("Section has no length\n")
+				} else	diamvec.append(diam(($1-mn)/L))
+			}
+		} else {
+			if (imp.ratio(1)>imp.ratio(0)) {
+				mx=imp.ratio(1)
+				mn=imp.ratio(0)
+			} else {
+				mx=imp.ratio(0)
+				mn=imp.ratio(1)
+			}
+			if ((mx>=zd) && (mn<=zd) ) {
+				if (verbosity > 4) printf("DistanceDiam: Distance = %g %s. lambda is %g to %g\n", \
+					$1, strtmp, -1*log(mx), -1*log(mn))
+				if (mn==mx) {
+					if (verbosity > 1) printf("Section has no electrotonic length\n")
+					diamvec.append(diam(0.5))
+				} else {
+					x=(zd-mn)/(mx-mn)
+					if (verbosity > 2) if (x<0) printf("DistanceDiam: x<0. Distance = %g %s\n", $1, strtmp)
+					if (verbosity > 2) if (x>1) printf("DistanceDiam: x>1. Distance = %g %s\n", $1, strtmp)
+					diamvec.append(diam(x))
+				}
+			}
+		}
+	}
+
+	nosec = diamvec.size()	// number of sections at distance
+	if (nosec<1) {
+		if (verbosity > 1) printf("Past end of cell. Distance = %g %s\n", $1, strtmp)
+		return -1
+	}
+
+	diamvec.div(2)		// radii of each section
+	diamvec.pow(3/2)	// radii of each section^1.5
+	equiv_diam = 2*diamvec.sum()^(2/3)	// diameter for equivalent cylinder
+	return equiv_diam
+
+}
+
+func DistanceList() {   local nosec,zl,zd,mx,mn,direct, tol	localobj sl, secs, imp
+// List = DistanceDiam( List, distance, frequency, SectionList, tol )
+// append a SectionList to List with all sections at dist $2 from cas
+// if there is a numeric third input argument, then $2 is treated as electrotonic distance (units of λ),
+//		otherwise $2 is the distance (in µm) along the neurite path.
+// $3 sets the signal frequency for measuring electrotonic distance
+// if a sectionlist is given for $o4, only those sections are considered, otherwise all sections are used
+
+ 	if (isclass($o1,"List")) secs = new SectionList() else secs = $o1
+
+	if (numarg()>2) {
+		if (argtype(3)==0) zl=1 else zl=0
+	} else zl=0 
+
+	strtmp = "micron"	// µm ('µ' isn't printable to stdout)
+	if (zl!=0) {
+		imp = new Impedance()
+		imp.loc(0)
+		imp.compute($3)
+		zd = exp(-1*$2)
+		strtmp = "lambda"	// λ ('λ' isn't printable)
+	}
+	
+	if (numarg()>3) {
+		if (argtype(4)==2)	{
+			sl = new SectionList()
+			forall ifsec $s4 sl.append()
+			if (verbosity > 3) sl.printnames()
+		} else if (argtype(4)==1)	sl = $o4
+	} else forall sl.append()
+
+	tol=0
+	if (numarg()>4) {
+		if (zl==0) {
+			tol = $5
+		} else tol = 1-exp(-1*$5)
+	}
+	
+	distance()
+
+	if (verbosity > 3) printf("Generating SectionList at distance %g +/- %2g %s\n", $2, tol, strtmp)
+
+	forsec sl {
+		if (zl==0) {
+			if (distance(1)>distance(0)) {
+				mx=distance(1)		// maximum distance
+				mn=distance(0)		// minimum distance
+			} else {
+				mx=distance(0)
+				mn=distance(1)
+			}
+			if ((mx>$2-tol) && (mn<=$2+tol) ) {
+				secs.append()
+			}
+		} else {
+			if (imp.ratio(1)>imp.ratio(0)) {
+				mx=imp.ratio(1)
+				mn=imp.ratio(0)
+			} else {
+				mx=imp.ratio(0)
+				mn=imp.ratio(1)
+			}
+			if ((mx>zd-tol) && (mn<=zd+tol) ) {
+				secs.append()
+			}
+		}
+	}
+	
+	if (verbosity > 3) printf("Adding SectionList at distance %g %s to %s\n", $2, strtmp, $o1)
+
+	nosec = SectionListCount(secs)	// number of sections at distance
+	if (nosec<1) if (verbosity > 2) printf("Past end of cell. Distance = %g %s\n", $2, strtmp)
+
+	if (isclass($o1,"List")) $o1.append(secs)
+
+	return nosec
+}
+
+proc make_equivalent_cable() { local i,ed,nedc,neac,linc,l,f,ims	localobj gls,dvec,lvec,sl,sl2,fobj
+//make_equivalent_cable()
+//make_equivalent_cable( frequency, length increment )
+// default frequency is 0, default increment is 0.005 λ
+	
+	ims = issplit()		// check if multisplit is on
+	if (ims) stopPar()	// if multisplit is on, stop it so ModelView contains only 1 cell
+
+	l = 0
+	if (numarg()>0) f=$1 else f=0
+	if (numarg()>1) linc=$2 else linc = 0.005
+	
+	dvec = new Vector()
+	dvec.append( diam(0) )
+	
+	MakeSecList(sl,"Axon")
+	sl2 = new SectionList()
+	
+	gls = new List()
+	MechList(gls)
+	
+	forall sl2.append()
+	sl2.remove(sl)
+	while (ed != -1) {
+		l += linc*2
+		ed = DistanceDiam(l,f,sl)	// get equivalent diameter for each distance
+		dvec.append(ed)
+	}
+
+	dvec.remove(dvec.size()-1)
+	neac = dvec.size()
+	
+	ed = 0
+	while (ed != -1) {
+		l += linc
+		ed = DistanceDiam(l,f,sl2)	// get equivalent diameter for each distance
+		dvec.append(ed)
+	}
+	
+	dvec.remove(dvec.size()-1)
+	nedc = dvec.size()-neac
+
+	if (verbosity > 1) printf("Calculated diameters of equivalent cylinder. Saving to file ... \n")
+	
+	lvec = new Vector(nedc)
+	lvec.indgen(linc)
+
+	sprint(filename, "%s/EquivCable_%g_%g_%g", DATADIR, linc, f, meanRm("",0,1))
+	fobj = new File(filename)
+	fobj.wopen()
+	
+	sprint(strtmp, "%s_params.txt", filename)
+// 	SaveParams( strtmp )
+	hoc_stdout(strtmp)
+    
+    PrintGlobals(gls)
+
+    hoc_stdout()
+
+	if (verbosity > 1) printf("Saved global and section parameters to file ... \n")
+
+// 	fobj.printf( "create soma\n" )
+	fobj.printf( "create axon[%d]\n", neac )
+	fobj.printf( "create dend[%d]\n", nedc )
+	fobj.printf( "nseg = 1\n\n" )
+	
+// 	fobj.printf( "soma.diam = %2.4f\n",  dvec.x[0] )
+// 	fobj.printf( "soma.L = %2.4f\n",  linc )
+
+	fobj.printf( "axon[0].diam = %2.4f\n",  dvec.x[0] )
+	fobj.printf( "axon[0].L = %2.4f\n",  linc*2 )
+	
+ 	for i = 1,neac-1 {
+ 		fobj.printf("axon[%d].diam = %2.4f\n",  i, dvec.x[i])
+ 		fobj.printf("axon[%d].L = %2.4f\n",  i, linc*2 )
+ 		fobj.printf("axon[%d] connect axon[%d](0), 1\n\n",i,i-1)
+ 	}
+
+	fobj.printf( "dend[0].diam = %2.4f\n",  dvec.x[neac] )
+	fobj.printf( "dend[0].L = %2.4f\n",  linc )
+	fobj.printf("dend[0] connect axon[0](0), 0\n\n")
+
+ 	for i = 1,nedc-1 {
+ 		fobj.printf("dend[%d].diam = %2.4f\n",  i, dvec.x[neac+i])
+ 		fobj.printf("dend[%d].L = %2.4f\n",  i, linc )
+ 		fobj.printf("dend[%d] connect dend[%d](0), 1\n\n",i,i-1)
+ 	}
+
+	fobj.close()
+	
+	if (ims) startPar()		// restart parallelization if needed
+
+}
+
+// equivalent cable (defined by sizofugal electrotonic distance)
+// update to include same total axial resistivity, membrane conductance, capacitance, and 
+// synaptic currents within each section
+// using compartments at same λ set rall equiv diam, mean Gmax, same Isyn, rescaled to membrane area
+
+// val = meanRm( sections, mechanism(s), 1)	loop through list and gls
+
+objref LSL
+proc ActiveEquivCable() { local d,ldc,k,i,n,gn,g,nedc,neac,linc,l,f,ims	localobj syns,gls,ls,sl,sl2,fobj,ms
+//ActiveEquivCable()
+//ActiveEquivCable( frequency, length increment, fields/branches )
+// default frequency is 0, default increment is 0.01 λ
+	
+	ims = issplit()		// check if multisplit is on
+	if (ims) stopPar()	// if multisplit is on, stop it so ModelView contains only 1 cell
+
+	if (numarg()>0) f=$1 else f=0
+	if (numarg()>1) linc=$2 else linc = 0.01
+	
+	LSL = new List()
+	
+	MakeSecList(sl,"Axon")
+	sl2 = new SectionList()
+	forall sl2.append()
+	sl2.remove(sl)
+	
+	gls = new List()
+// 	MechList(gls)
+	getglist(gls)
+	gn = gls.count()
+	
+	l = 0
+	n=1
+	while (n != 0) {
+		l += linc
+		n = DistanceList(LSL,l,f,sl)	// get equivalent diameter for each distance
+	}
+
+	if (verbosity > 2) printf("Generated section lists for axon. %d sections  ... \n", LSL.count())
+	neac = LSL.count()-1
+	LSL.remove(LSL.count())
+	
+	n = 1
+	l=0
+	while (n != 0) {
+		l += linc
+		n = DistanceList(LSL,l,f,sl2)	// get equivalent diameter for each distance
+	}
+
+	if (verbosity > 2) printf("Generated section lists for dendrites. %d sections  ... \n", LSL.count())
+	
+	nedc = LSL.count()-1-neac
+	LSL.remove(LSL.count())
+
+	if (verbosity > 1) printf("Generated section lists for active equivalent cable. Calculating conductances ... \n")
+	
+	sprint(filename, "%s/EquivCable_%g_%g_%g", DATADIR, linc, f, meanRm("",0,1))
+// 	SaveParams( strtmp )
+	hoc_stdout(filename)
+    
+	PrintGlobals()
+//     forall psection()
+	hoc_stdout()
+
+	if (verbosity > 2) printf("Saved global parameters to file ... \n")
+
+	fobj = new File(filename)
+	fobj.aopen()
+
+// 	fobj.printf( "create soma\n" )
+	fobj.printf( "\ncreate axon[%d]\n", neac )
+	fobj.printf( "create dend[%d]\n", nedc )
+	fobj.printf( "nseg = 1\n\n" )
+	
+// 	fobj.printf( "soma.diam = %2.4f\n",  dvec.x[0] )
+// 	fobj.printf( "soma.L = %2.4f\n",  linc )
+
+
+// need to calculate lambda to µm conversion factor here
+//	ldc = maxd/maxlambda
+	ldc=205
+ 	
+	for i = 0,neac-1 {	// for each distance
+ 		d=0
+		forsec LSL.o(i) d+=(diam/2)^(3/2)
+		fobj.printf("axon[%d] {\n", i)
+ 		fobj.printf("diam = %g\n", 2*d^(2/3))
+ 		fobj.printf("L = %g\n", linc*ldc )
+ 		
+		for n=0,gn-1 {	// for each conductance
+			ms = new MechanismStandard(gls.o(n).s,1)
+			if (ms.count == 0) { 
+				continue
+			}
+			size = ms.name(tmpstr, 0)
+			sprint(strtmp, "tmp = %s", tmpstr)
+			
+			g=0
+			forsec LSL.o(i) {	// for each compartment at the given distance
+				if (ismembrane(gls.o(n).s)) {
+					execute(strtmp)
+					g += tmp*area(0.5)
+				}
+			}
+			if (g>0) {
+				fobj.printf( "insert %s { %s = %2.4f}\n", gls.o(n).s, tmpstr, g/sectionarea(LSL.o(i))  )
+			}
+		}
+		fobj.printf("}\n")
+ 		if (i>0) fobj.printf("axon[%d] connect axon[%d](0), 1\n\n",i,i-1)
+ 	}
+ 	
+ 	for i = 0,neac-1 { LSL.remove(i) }
+ 	
+ 	if (verbosity > 2) printf("Saved axon section parameters to file ... \n")
+
+// 	syns = new List()
+// 	for i = 0,esyn.count()-1 {
+// 		syns.append(esyn.o(i))
+// 	}
+// 	for i = 0,isyn.count()-1 {
+// 		syns.append(isyn.o(i))
+// 	}
+	
+	for i = 0,nedc-1 {
+ 		d=0
+		forsec LSL.o(i) d+=(diam/2)^(3/2)
+		fobj.printf("dend[%d] {\n", i)
+		fobj.printf("diam = %2.2f\n", 2*d^(2/3))
+ 		fobj.printf("L = %2.2f\n", linc*ldc )
+ 		
+		for n=0,gn-1 {	// for each conductance
+			ms = new MechanismStandard(gls.o(n).s,1)
+			if (ms.count == 0) { 
+				continue
+			}
+			size = ms.name(tmpstr, 0)
+			sprint(strtmp, "tmp = %s", tmpstr)
+			
+			g=0
+			forsec LSL.o(i) {	// for each compartment at the given distance
+				if (ismembrane(gls.o(n).s)) {
+					execute(strtmp)
+					g += tmp*area(0.5)
+				}
+			}
+			if (g>0) {
+				fobj.printf( "insert %s { %s = %2.4g}\n", gls.o(n).s, tmpstr, g/sectionarea(LSL.o(i))  )
+			}
+ 		}
+// 		ls = get_subset(syns, LSL.o(i),1)
+// 		for n=0,ls.count()-1 {
+// 			classname(ls.o(n), strtmp)
+// 			ms = new MechanismStandard(strtmp,1)
+// 			ms.in(ls.o(n))
+// 			fobj.printf( "insert %s { ", strtmp )
+// 			for k=0,ms.count()-1 {
+// 				ms.name(tmpstr, k)
+// 				fobj.printf( " %s = %g", tmpstr, ms.get(tmpstr)  )
+// 			}
+// 			fobj.printf( "}\n"  )
+// 		}
+		fobj.printf("}\n")
+ 		if (i>0) {
+ 			fobj.printf("dend[%d] connect dend[%d](0), 1\n\n",i,i-1)
+ 		} else fobj.printf("dend[0] connect axon[0](0), 0\n\n")
+ 	}
+
+	fobj.close()
+	
+	if (ims) startPar()		// restart parallelization if needed
+
+}
+

@@ -1,0 +1,503 @@
+
+
+// func sum_g_chan() { local Gsum
+// // meang_KD_ca3( Dt )
+// 
+// 	Gsum=0
+// 	sprint( strtmp, "Gsum += g_%s*area(0.5)", $s1)
+// 	forsec $o2 {
+// 		execute(strtmp)
+// // 		Gsum += g_hcn*area(0.5)	// S/cm2*µm2 ≠ S
+// 	}
+// 	return Gsum
+// }
+
+// 11 July 2017 - RBD - fixed units, so values match description and fixed bug wasted calculations
+
+// ***** hAnalysis
+begintemplate hAnalysis
+public gh, nh, hSA, hGM, ih, SL, update, setGtot, remove
+external HList, AddToStep, RemoveFromStep, StepEvents_
+objref this, SL
+
+proc init() {
+
+	if (numarg()) {
+		if (argtype(1)==1) {		// input 1 is SectionList obj
+			SL = $o1
+		} else if (argtype(1)==2) {		// input 1 is char array naming sections
+			SL = new SectionList()
+			forall ifsec $s1 SL.append()
+		} else SL = HList
+	} else SL = HList		// no input uses default SectionList
+	
+	forsec SL hSA += area(0.5)		// total surface area µm2
+	// to get the average conductance density within sections containing the channel the
+	// 	 HList should be limited to sections with the channel. For the average conductance 
+	//   density across the entire cell then HList should contain all sections
+	
+	setGtot()
+	update()
+	AddToStep(this)
+}
+
+proc setGtot() {
+	forsec SL {
+		if (ismembrane("h")) {
+			hGM += gmax_h*area(0.5)*1e-2		// maximum total conductance µS
+		} else SL.remove()
+	}
+}
+
+proc update() { local Gsum, Isum, gtmp
+
+	Gsum=0
+	Isum=0
+	if (hGM == 0)	return
+	forsec SL {
+		gtmp = g_h(0.5)*area(0.5)*1e-2	// section conductance in µS
+		Gsum += gtmp					// total conductance (µS)
+		Isum += gtmp*(v(0.5)-e_h)		// total current in (nA) µS*10^-3(V/mV)
+	}
+	nh = Gsum/hGM		// % channel activation
+	gh = Gsum/hSA*1e2	// conductance density S/cm2
+	ih = Isum			// total membrane current (nA)
+}
+
+proc remove() {
+	RemoveFromStep(this)
+}
+endtemplate hAnalysis
+
+
+// ***** hcnAnalysis
+begintemplate hcnAnalysis
+public gh, nh, hSA, hGM, ih, SL, update, remove, setGtot
+external HList, AddToStep, RemoveFromStep, StepEvents_
+objref this, SL
+
+proc init() {
+
+	if (numarg()) {
+		if (argtype(1)==1) {
+			SL = $o1
+		} else if (argtype(1)==2) {
+			SL = new SectionList()
+			forall ifsec $s1 SL.append()
+		} else SL = HList
+	} else SL = HList
+
+	forsec SL hSA += area(0.5)		// total surface area µm2
+	// to get the average conductance density within sections containing the channel the
+	// 	 HList should be limited to sections with the channel. For the average conductance 
+	//   density across the entire cell then HList should contain all sections
+
+	setGtot()
+	update()
+	SN=AddToStep(this)
+	SN=SN-1
+}
+
+proc setGtot() {
+	forsec SL {
+		if (ismembrane("hcn")) {
+			hGM += gmax_hcn*area(0.5)*1e-2		// maximum total conductance µS
+		} else SL.remove()
+	}
+}
+
+proc update() { local Gsum, Isum, gtmp
+
+	Gsum=0
+	Isum=0
+	if (hGM == 0) return
+	forsec SL {
+		gtmp = g_hcn(0.5)*area(0.5)*1e-2	// section conductance in µS
+		Gsum += gtmp						// total conductance (µS)
+		Isum += gtmp*(v(0.5)-e_hcn)			// total current in (nA) µS*mV
+	}
+	nh = Gsum/hGM		// % channel activation
+	gh = Gsum/hSA*1e2	// conductance density S/cm2
+	ih = Isum			// total membrane current (nA)
+}
+
+proc remove() {
+	RemoveFromStep(this)
+}
+endtemplate hcnAnalysis
+
+
+// ***** MAnalysis
+begintemplate MAnalysis
+public gM, nM, MSA, MGM, iM, SL, update, remove, setGtot
+external MList, AddToStep, RemoveFromStep, StepEvents_
+objref this, SL
+
+proc init() {
+
+	if (numarg()) {
+		if (argtype(1)==1) {
+			SL = $o1
+		} else if (argtype(1)==2) {
+			SL = new SectionList()
+			forall ifsec $s1 SL.append()
+		} else SL = MList
+	} else SL = MList
+
+	forsec SL MSA += area(0.5)
+
+	setGtot()
+	update()
+	AddToStep(this)
+}
+
+proc setGtot() {
+	forsec SL {
+		if (ismembrane("M")) {
+			MGM += gmax_M*area(0.5)*1e-2	// maximum total conductance µS
+		} else SL.remove()
+	}
+}
+
+proc update() { local Gsum, Isum, gtmp
+	Gsum=0
+	Isum=0
+	if (MGM == 0) return
+	forsec SL {
+		gtmp = g_M(0.5)*area(0.5)*1e-2	// section conductance in µS
+		Gsum += gtmp					// total conductance (µS)
+		Isum += gtmp*(v(0.5)-ek)		// total current in (nA) µS*mV
+	}
+	nM = Gsum/MGM		// % channel activation
+	gM = Gsum/MSA*1e2	// conductance density S/cm2
+	iM = Isum			// total membrane current (nA)
+}
+
+proc remove() {
+	RemoveFromStep(this)
+}
+
+endtemplate MAnalysis
+
+
+// ***** KD3Analysis
+begintemplate KD3Analysis
+public gKD, lKD, nKD, KDSA, KDGM, iKD, SL, update, remove
+external KDList, AddToStep, RemoveFromStep, StepEvents_
+objref this, SL
+
+proc init() {
+	if (numarg()) {
+		if (argtype(1)==1) {
+			SL = $o1
+		} else if (argtype(1)==2) {
+			SL = new SectionList()
+			forall ifsec $s1 SL.append()
+		} else SL = KDList
+	} else SL = KDList
+	forsec SL KDSA += area(0.5)		// total area µm2
+	forsec SL {
+		if (ismembrane("KD_ca3")) {
+			KDGM += gmax_KD_ca3*area(0.5)*1e-2	// maximum total conductance µS
+		} else SL.remove()
+	}
+	update()
+	AddToStep(this)
+}
+
+proc update() { local Gsum, lsum, nsum, gtmp, am
+	Gsum=0
+	Isum=0
+	lsum=0
+	nsum=0
+	if (KDGM == 0) return
+	forsec SL {
+		am = area(0.5)*1e-2
+		gtmp = g_KD_ca3(0.5)*am			// section conductance in µS
+		Gsum += gtmp					// total conductance (µS)
+		Isum += gtmp*(v(0.5)-ek)		// total current in (nA) µS*mV
+		lsum += l_KD_ca3(0.5)*gmax_KD_ca3*am
+		nsum += n_KD_ca3(0.5)*gmax_KD_ca3*am
+	}
+	gKD = Gsum/KDSA*1e2	// conductance density (S/cm2)
+	lKD = lsum/KDGM		// % channel inactivation
+	nKD = nsum/KDGM		// % channel activation
+	iKD = Isum			// total membrane current (nA)
+}
+
+proc remove() {
+	RemoveFromStep(this)
+}
+endtemplate KD3Analysis
+
+
+// ***** KDAnalysis
+begintemplate KDAnalysis
+public gKD, lKD, nKD, KDSA, KDGM, iKD, SL, update, remove, setGtot
+external KDList, AddToStep, RemoveFromStep, StepEvents_
+objref this, SL
+
+proc init() {
+
+	if (numarg()) {
+		if (argtype(1)==1) {
+			SL = $o1
+		} else if (argtype(1)==2) {
+			SL = new SectionList()
+			forall ifsec $s1 SL.append()
+		} else SL = KDList
+	} else SL = KDList
+	
+	forsec SL KDSA += area(0.5)		// total surface area µm2
+	// to get the average conductance density within sections containing the channel the
+	// 	 HList should be limited to sections with the channel. For the average conductance 
+	//   density across the entire cell then HList should contain all sections
+
+	setGtot()
+	update()
+	AddToStep(this)
+}
+
+proc update() { local Gsum, lsum, nsum, gtmp, am
+	Gsum=0
+	Isum=0
+	lsum=0
+	nsum=0
+	if (KDGM == 0) return
+	forsec SL {
+		am = area(0.5)*1e-2
+		gtmp = g_KD(0.5)*am			// section conductance in µS
+		Gsum += gtmp					// total conductance (µS)
+		Isum += gtmp*(v(0.5)-ek)		// total current in (nA) µS*mV
+		lsum += l_KD(0.5)*gmax_KD*am
+		nsum += n_KD(0.5)*gmax_KD*am
+	}
+	gKD = Gsum/KDSA*1e2	// conductance density (S/cm2)
+	lKD = lsum/KDGM		// % channel inactivation
+	nKD = nsum/KDGM		// % channel activation
+	iKD = Isum			// total membrane current (nA)
+}
+
+proc setGtot() {
+	forsec SL {
+		if (ismembrane("KD")) {
+			KDGM += gmax_KD*area(0.5)*1e-2		// maximum total conductance µS
+		} else SL.remove()
+	}
+}
+
+proc remove() {
+	RemoveFromStep(this)
+}
+endtemplate KDAnalysis
+
+
+begintemplate KAAnalysis
+public gKA, lKA, nKA, KASA, KAGM, iKA, SL, update, remove, setGtot
+external KAList, AddToStep, RemoveFromStep, StepEvents_
+objref this, SL
+
+proc init() {
+
+	if (numarg()) {
+		if (argtype(1)==1) {
+			SL = $o1
+		} else if (argtype(1)==2) {
+			SL = new SectionList()
+			forall ifsec $s1 SL.append()
+		} else SL = KAList
+	} else SL = KAList
+	
+	forsec SL KASA += area(0.5)		// total surface area µm2
+	// to get the average conductance density within sections containing the channel the
+	// 	 HList should be limited to sections with the channel. For the average conductance 
+	//   density across the entire cell then HList should contain all sections
+
+	setGtot()
+	update()
+	AddToStep(this)
+}
+
+proc update() { local Gsum, lsum, nsum, gtmp, am
+	Gsum=0
+	Isum=0
+	lsum=0
+	nsum=0
+	if (KAGM == 0) return
+	forsec SL {
+		am = area(0.5)*1e-2
+		gtmp = g_KA(0.5)*am			// section conductance in µS
+		Gsum += gtmp					// total conductance (µS)
+		Isum += gtmp*(v(0.5)-ek)		// total current in (nA) µS*mV
+		lsum += l_KA(0.5)*gmax_KA*am
+		nsum += n_KA(0.5)*gmax_KA*am
+	}
+	gKA = Gsum/KASA*1e2	// conductance density (S/cm2)
+	lKA = lsum/KAGM		// % channel inactivation
+	nKA = nsum/KAGM		// % channel activation
+	iKA = Isum			// total membrane current (nA)
+}
+
+proc setGtot() {
+	forsec SL {
+		if (ismembrane("KA")) {
+			KAGM += gmax_KA*area(0.5)*1e-2		// maximum total conductance µS
+		} else SL.remove()
+	}
+}
+
+proc remove() {
+	RemoveFromStep(this)
+}
+endtemplate KAAnalysis
+
+
+begintemplate KD2Analysis
+public gKD, lKD, nKD, KDSA, KDGM, iKD, SL, update, remove
+external KDList, AddToStep, RemoveFromStep, StepEvents_
+objref this, SL
+// strdef gstr, lstr, nstr, maxstr
+
+proc init() {
+	if (numarg()) {
+		if (argtype(1)==1) {
+			SL = $o1
+		} else if (argtype(1)==2) {
+			SL = new SectionList()
+			forall ifsec $s1 SL.append()
+		} else SL = KDList
+	} else SL = KDList
+	forsec SL KDSA += area(0.5)
+	forsec SL {
+		if (ismembrane("KD2")) {
+			KDGM += gmax_KD2*area(0.5)*1e-2
+		} else SL.remove()
+	}
+	update()
+	AddToStep(this)
+}
+
+proc update() { local Gsum, lsum, nsum, gtmp, am
+	Gsum=0
+	Isum=0
+	lsum=0
+	nsum=0
+	if (KDGM == 0) return
+	forsec SL {
+		am = area(0.5)*1e-2
+		gtmp = g_KD2(0.5)*am			// section conductance in µS
+		Gsum += gtmp					// total conductance (µS)
+		Isum += gtmp*(v(0.5)-ek)		// total current in (nA) µS*mV
+		lsum += l_KD2(0.5)*gmax_KD2*am
+		nsum += n_KD2(0.5)*gmax_KD2*am
+	}
+	gKD = Gsum/KDSA*1e2	// conductance density (S/cm2)
+	lKD = lsum/KDGM		// % channel inactivation
+	nKD = nsum/KDGM		// % channel activation
+	iKD = Isum			// total membrane current (nA)
+}
+
+proc remove() {
+	RemoveFromStep(this)
+}
+endtemplate KD2Analysis
+
+
+begintemplate CaTAnalysis
+public gCaT, sCaT, hCaT, CaTSA, CaTGM, iCaT, SL, update, remove
+external CaTList, AddToStep, RemoveFromStep, StepEvents_
+objref this, SL
+
+proc init() {
+	if (numarg()) {
+		if (argtype(1)==1) {
+			SL = $o1
+		} else if (argtype(1)==2) {
+			SL = new SectionList()
+			forall ifsec $s1 SL.append()
+		} else SL = CaTList
+	} else SL = CaTList
+	forsec SL CaTSA += area(0.5)	// (µm2)
+	// to get the average conductance density within sections containing the channel the
+	// 	 SectionList should be limited to sections with the channel. For the average conductance 
+	//   density across the entire cell the SectionList should contain all sections
+	forsec SL {
+		if (ismembrane("CaT")) {
+			CaTGM += gmax_CaT*area(0.5)*1e-2	// max total conductance in µS
+		} else SL.remove()
+	}
+	update()
+	AddToStep(this)
+}
+
+proc update() { local Gsum, lsum, nsum, gtmp, am
+	Gsum=0
+	Isum=0
+	ssum=0
+	hsum=0
+	if (CaTGM == 0) return
+	forsec SL {
+		am = area(0.5)*1e-2
+		gtmp = g_CaT(0.5)*am			// section conductance in µS
+		Gsum += gtmp					// total conductance (µS)
+		Isum += gtmp*(v(0.5)-eca)		// total current in (nA) µS*mV
+		ssum += s_CaT(0.5)*gmax_CaT*am
+		hsum += h_CaT(0.5)*gmax_CaT*am
+	}
+	gCaT = Gsum/CaTSA*1e2	// conductance density (S/cm2)
+	sCaT = ssum/CaTGM		// % channel inactivation
+	hCaT = hsum/CaTGM		// % channel activation
+	iCaT = Isum				// total membrane current (nA)
+}
+
+proc remove() {
+	RemoveFromStep(this)
+}
+endtemplate CaTAnalysis
+
+
+begintemplate KCaAnalysis
+public gKCa, nKCa, KCaSA, KCaGM, iKCa, SL, update, remove
+external CaTList, AddToStep, RemoveFromStep, StepEvents_
+objref this, SL
+
+proc init() {
+	if (numarg()) {
+		if (argtype(1)==1) {
+			SL = $o1
+		} else if (argtype(1)==2) {
+			SL = new SectionList()
+			forall ifsec $s1 SL.append()
+		} else SL = CaTList
+	} else SL = CaTList
+	forsec SL KCaSA += area(0.5)
+	// to get the average conductance density within sections containing the channel the
+	// 	 SectionList should be limited to sections with the channel. For the average conductance 
+	//   density across the entire cell the SectionList should contain all sections
+	forsec SL {
+		if (ismembrane("KCa")) {
+			KCaGM += gmax_KCa*area(0.5)*1e-2 	// max total conductance in µS
+		} else SL.remove()
+	}
+	update()
+	AddToStep(this)
+}
+
+proc update() { local Gsum, Isum, gtmp
+	Gsum=0
+	Isum=0
+	if (KCaGM == 0) return
+	forsec SL {
+		gtmp = g_KCa(0.5)*area(0.5)*1e-2// section conductance in µS
+		Gsum += gtmp					// total conductance (µS)
+		Isum += gtmp*(v(0.5)-ek)		// total current in (nA) µS*10^-3(V/mV)
+	}
+	gKCa = Gsum/KCaSA*1e2	// conductance density (S/cm2)
+	nKCa = Gsum/KCaGM		// % channel activation
+	iKCa = Isum				// total membrane current (nA)
+}
+
+proc remove() {
+	RemoveFromStep(this)
+}
+endtemplate KCaAnalysis

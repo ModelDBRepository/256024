@@ -1,0 +1,278 @@
+
+// func isclass( objref, class name )	-	checks if object is of a given type
+	// dependency: none (stdlib and stdrun always assumed to be loaded and not listed in dependency)
+
+// proc MakeSecList( SectionList, section, ... )	-	adds sections to SectionList from input strdef(s)
+	// dependency: isclass (local)
+
+// obfunc chkSecList( sections )	-	checks if input is SectionList. Makes one if not (NOTE: this is useless)
+	// dependency: none
+
+// proc MakeStringList( List, section, ... )	-	adds Strings from input strdef(s) to List
+	// dependency: none
+
+// func SectionListCount( SectionList )	-	returns number of sections in SectionList
+	// dependency: none
+
+// proc findobj( out List, in List, parameter, value)	-	finds obj in List that have a given attribute
+	// dependency: none
+
+strdef strtmp, tmpstr		// tmp strings used by several procs & funcs (there are no local strdef in hoc)
+objref StepEvents_, AdvanceEvents_
+StepEvents_ = new List()
+AdvanceEvents_ = new List()
+
+
+proc init() {
+	finitialize(v_init)
+	doStepEvent()
+}
+
+proc step() {local i
+	if (using_cvode_) {
+		advance()
+	}else for i=1,nstep_steprun {
+		advance()
+	}
+	doStepEvent()
+	Plot()
+}
+
+proc doStepEvent() {local i,cnt
+	
+	cnt = StepEvents_.count()-1
+	for i=0,cnt { 
+		StepEvents_.o(i).update()
+	}
+
+}
+
+proc impedancemenu() {
+	xmenu("Impedance")
+	xbutton("Frequency", "load_file(\"impratio.hoc\") makeImpRatio()")
+	xbutton("Path", "load_file(\"impedanx.hoc\") makeImpx()")
+	xbutton("log(A) vs x", "load_file(\"logax.hoc\") makelogax()")
+	xbutton("Shape", "load_file(\"attshape.hoc\") makeImpShape()")
+	xmenu()
+}
+
+proc CleanStepEvent() {local i
+	
+	for (i=StepEvents_.count()-1; i>=0; i=i-1) {
+		StepEvents_.remove(i)
+	}
+
+}
+
+func AddToStep() {local n
+	n = StepEvents_.append($o1)
+	return n
+}
+
+proc RemoveFromStep() {local n
+	n = StepEvents_.index($o1)
+	if (n>-1)	StepEvents_.remove(n)
+}
+
+
+proc RemoveFromList() {local n
+	n = $o1.index($o2)
+	if (n>-1)	$o1.remove(n)
+}
+
+func StringFind() {local x, n
+// find the index of a string in a List of Strings
+// StringFind(List of Strings, test string)
+
+	for n=0,count {
+		x = strcmp($o1.o(n).s, $s2)
+		if (x==0) return n
+	}
+	return -1
+}
+
+func SectionFind() {local x, n
+// find the index of a section in a SectionList by name
+// SectionFind(List of Strings, test string)
+
+	n=0
+	forsec $o1 {
+		x = strcmp( secname(), $s2)
+		if (x==0) {
+			return n
+		} else {
+			n+=1
+		}
+	}
+	return -1
+}
+
+func isclass() {
+// isclass( object, class name)
+// returns 1 if the object is of the specified class, returns 0 if not
+
+   classname($o1, strtmp)
+   return strcmp(strtmp, $s2) == 0
+}
+
+proc MakeSecList() { local i,count //localobj sl, sref
+//MakeSecList( SectionList, char list)
+// create a new sectionlist from an input list of section names. uses greedy regexp ("" matches all)
+	
+	//sref = new SectionRef()
+	count = numarg()
+	//sl = $o1
+	if (isclass( $o1,"NULLobject")) $o1 = new SectionList()
+	for i=2,count {
+		forall ifsec $si $o1.append()
+		//strtmp = $si
+		//sl.append( strtmp )
+		//sprint(tmpstr, "%s sref = new SectionRef()", $si)
+		//sprint(tmpstr, "%s sl.append()", $si)
+		//execute(tmpstr)
+		//sl.append(sref)
+	}
+	//sl.printnames()
+	
+}
+
+func objrefcount() {local i
+	execute1("for i=0,1e3 $o1[i]",0)
+	return i
+}
+
+
+proc get_sec() {
+// get the section name for the specified inserted mechanism
+// get_sec(point process, strdef)
+// get_sec(point process, string list)
+
+	if (argtype(2)==2) {
+		$o1.get_loc() $s2 = secname() pop_section()
+	} else if (argtype(2)==1) {
+		$o1.get_loc() $o2.append(new String( secname() )) pop_section()
+	}
+
+}
+
+
+proc get_sections() {local i
+// get_sections(point process list, sectionlist)
+// generates a sectionlist of the locations of a list of inserted mechanisms
+
+	if (object_id($o2,1) == -1)	$o2 = new SectionList()
+	for i = 0,$o1.count-1 {
+		$o1.o(i).get_loc() $o2.append() pop_section()
+	}
+
+}
+
+obfunc get_subset() {local i, rm	localobj sL, PPs
+// list = get_subset(point process list, section list, remove)
+// returns the subset of objects in $o1 that are inserted in sections within $o2
+// if remove, then remove the collected objects from $o1
+
+	PPs = new List()
+	get_sections( $o1, sL )
+	rm=0		// whether to remove object from original list after adding to new list
+	if (numarg()>2) rm = $3
+	
+	i=0		// section number
+	forsec sL {		// for each oject in $o1 (iterate by section) 
+		ifsec $o2 {	// if the section is also in test SectionList
+			PPs.append($o1.o(i))	// add object to new list
+			if (rm>0) {
+				$o1.remove(i)
+				i-=1		// deprecate section number. After removal of o(i), o(i) is next object
+			}
+		}
+		i+=1
+	}
+
+	return PPs
+}
+
+obfunc chkSecList() { localobj sl
+// chkSecList( sections )
+// returns objref of SectionList including all sections indicated by input arg. Empty input matches all
+
+	if (argtype(1)==2)	{
+		sl = new SectionList()
+		forall ifsec $s1 sl.append()
+		if (verbosity > 2) printf("generated new SectionList from string: chkSecList\n")
+		if (verbosity > 3) sl.printnames()
+	} else if (argtype(1)==1) {
+		sl = $o1
+	} else {
+		sl = new SectionList()
+		forall sl.append()
+	}
+
+	return sl
+}
+
+proc MakeStringList() { local i,count
+// MakeStringList( List, string1, string2, ...)
+// makes a List of String obj
+	
+	if (object_id($o1,1) == -1)	$o1 = new List()
+	count = numarg()
+	if (verbosity > 2) printf("MakeStringList: adding %g strings\n", count-1 )
+	for i=2,count {
+		$o1.append(new String($si))
+	}
+	
+}
+
+func SectionListCount() { local count
+//count = SectionListCount( sectionlist )
+// counts number of unique sections in list
+	
+	count=0
+	$o1.unique()
+	forsec $o1 { count+=1 }
+
+	return count
+}
+
+
+proc findobj() {local p0,p1,x,rng	localobj outlist, inlist, ms
+// findobj(subset, full list, parameter, value)
+// findobj(subset, full list, parameter, min value, max value)
+//
+// finds objects within List that has parameter equal to value or between min and max values
+// returns a List with found objects
+
+	outlist = $o1
+	inlist = $o2
+	tmpstr = $s3
+	p0 = $4
+	rng = 0
+	
+	if (numarg()>4) {
+		p1 = $5
+		rng = 1
+	}
+	
+	classname(inlist.o(0), strtmp)
+	ms = new MechanismStandard(strtmp)
+	
+	for i=0,inlist.count()-1 {
+		
+		if ( isclass(inlist.o(i), strtmp) ) {
+			ms.in(inlist.o(i))
+		} else {
+			classname(inlist.o(0), strtmp)
+			ms = new MechanismStandard(strtmp)
+			ms.in(inlist.o(i))
+		}
+		x = ms.get(tmpstr)
+		if (rng == 0) {
+			if (x == p0)   outlist.append(inlist.o(i))
+		} else {
+			if (( x >= p0) && (x <= p1))  outlist.append(inlist.o(i))
+		}
+	}
+
+}
+

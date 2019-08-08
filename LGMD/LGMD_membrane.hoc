@@ -1,0 +1,538 @@
+
+forall {
+	Ra = axial
+	cm = Cm
+	insert pas
+	g_pas = gl
+	e_pas = el
+}
+
+if (passive==0) {
+
+/* --- Adjust global channel kinetic parameters --- */
+
+vhalfn_NaP=-52
+vhalfl_NaP=-38
+tls_NaP = 7.0
+tns_NaP = -8.5
+zl_NaP = -6.0
+zn_NaP = 8.2
+vn2_NaP = -45
+vl2_NaP = -50
+tnmin_NaP = 2
+tnmax_NaP = 10
+tlmin_NaP = 4
+tlmax_NaP = 10
+
+tmin_CaS = 1.6
+tmax_CaS = 3.1
+vn2_CaS = -40
+// s2_CaS = -16
+vhalfm_CaS = -26
+vhalfh_CaS = -36
+tadj_CaS = 1
+hmin_CaS = 10
+hb_CaS = -130
+hs_CaS = -30
+
+tmin_CaT = 5
+tmax_CaT = 12
+vhalf_CaT = -36
+vn2_CaT = -55
+s1_CaT = 6.3
+s2_CaT = -14
+kh_CaT = -5.0
+// nic_CaT = 0
+// sp_CaT = 1
+hs_CaT = -13
+hb_CaT = -105
+hmin_CaT = 15
+tadj_CaT = 13
+thh_CaT = -63.5
+
+// vhalf_M = -44.5
+taumax_M = 30
+taumin_M = 5
+s1_M=11
+s2_M=-10.0
+
+kam_Na=0.066
+Aam_Na=20
+dam_Na = 0
+kbm_Na=0.06
+Abm_Na=5.3
+dbm_Na = -32
+kah_Na=0.13
+Aah_Na=2.2
+dah_Na=-59
+kbh_Na=0.17
+Abh_Na=4.5
+dbh_Na=-29
+
+// tns_HH_Kdr=-10
+zn_HH_Kdr=9.0
+t2_HH_Kdr=0.3
+vhalf_HH_Kdr = -35
+// vn2_HH_Kdr = -55
+
+/* --- Adjust channel densities for each section --- */
+
+forsec "Axon" {
+	Ra = axial/5
+	g_pas=gl*4
+// 	e_pas = -64
+	insert M
+	gmax_M = SIZM*0.5
+	vhalf_M = -40
+	insert h
+	gmax_h = 2.6e-5
+	insert Na
+	gmax_Na = SIZNa*0.10
+	insert HH_Kdr
+	gmax_HH_Kdr = SIZKdr
+// 	t1_HH_Kdr=200
+// 	ek = EK+2
+	ena = ENa
+}
+
+forsec siz {
+	Ra=axial*1.5
+	g_pas = gl*4
+// 	e_pas = -65
+	insert Na
+	gmax_Na = SIZNa
+	insert HH_Kdr
+	gmax_HH_Kdr = SIZKdr
+	insert M
+	gmax_M = SIZM
+	vhalf_M = -46
+	insert KCa
+	gmax_KCa = 0.008
+	insert CaT
+	gmax_CaT = 5.0e-4
+	insert CaS
+	gmax_CaS = 1.2e-3
+	insert CaIn
+	tau1_CaIn = 2000
+	tau2_CaIn = 100
+// 	insert CaInternal
+// 	tau_ca_CaInternal = 150			// time constant of Ca++ removal
+	ek = EK
+	eca = ECa
+	ena = ENa
+}
+
+// forsec "ASIZ" Ra=300
+// forsec "DSIZ" Ra=300
+
+forsec "Handle" {
+	Ra = axial/4
+	insert Na
+	gmax_Na = 1.5e-2
+	insert HH_Kdr
+	gmax_HH_Kdr = SIZKdr/2
+	insert M
+	gmax_M = SIZM/3 // if handle_M_dist() used, this value is irrelevent
+	vhalf_M = -48
+	ek = EK
+	ena = ENa
+}
+//MS_ = new MechanismStandard("Na",2)
+
+handle_Na_dist()
+handle_M_dist()
+forsec "Handle" gmax_Na=gmax_Na*0.5
+forsec "Handle" gmax_M=gmax_M*1
+
+for i=0,32 {
+	Handle[i] {
+//  	e_pas = -66
+		Ra = axial*0.4
+		insert KCa
+		gmax_KCa = 6.0e-3
+		insert CaT
+		gmax_CaT = 2.8e-3
+		insert CaS
+		gmax_CaS = 1.5e-3
+// 		gmax_HH_Kdr = SIZKdr
+		insert CaIn
+		tau1_CaIn = 370
+		tau2_CaIn = 100
+// 		insert CaInternal
+// 		tau_ca_CaInternal = 50			// time constant of Ca++ removal
+		eca=ECa
+	}
+}
+
+forall if (ismembrane("CaInternal")) {
+	alpha_ca_CaInternal = 2.5e-4	// determines ica : cai ratio (uM-cm2/ms/uA)
+	ca_init_CaInternal = 1.3e-4		// initial cai, sets initial KCa (mM)
+}
+
+forall if (ismembrane("CaIn")) {
+	alpha_ca_CaIn = 6.0e-5	// determines ica : cai ratio (mM-cm2/ms/nA)
+}
+ca_init_CaIn = 1.3e-4	// initial cai (mM), sets initial KCa
+// tmax_CaL=0.1
+minca_KCa= 1.35e-4		// minimum cai before KCa starts to activate (mM)
+pwr_KCa = 4
+kD_ca_KCa= 1.0e-4
+tau_KCa = 0.1
+ca_min1_CaIn = 2e-5
+ca_min2_CaIn = 3.5e-4
+// ca_min_CaInternal=5.0e-5
+
+
+forsec "MainTrunk" {
+// 	Ra=100
+// 	insert M
+// 	gmax_M = 4.0e-4
+// 	vhalf_M = -51
+// 	insert KdrF
+// 	gmax_KdrF = 4.0e-04
+// 	insert Na
+// 	gmax_Na = 5e-3
+// 	ena = ENa
+}
+
+// forsec "Tines" 	Ra=axial
+
+Handle[60] distance()
+forsec FieldA {
+// 	Ra=axial*1.5
+// 	insert HH_Kdr
+// 	gmax_HH_Kdr = SIZKdr/20
+
+// 	insert NaP
+// 	gmax_NaP = 1.2e-4
+// 	ena = ENa
+// 	gmax_NaP = 4e-7*distance(0.5)
+
+// 	insert KA
+// 	gmax_KA=1.5e-3
+
+	insert M
+	gmax_M = 5.0e-5
+	vhalf_M = -54
+	if (synCa > 3) {
+		insert h_ca
+		gmax_h_ca = 1.2e-4
+	} else if (synCa == 3) {
+		insert CN
+		insert hcn
+		gmax_hcn = 1.4e-4
+	} else {
+		insert h
+		gmax_h = 1.0e-4
+		taumax_h=1100
+	}
+
+// 	if (synCa>0) { insert cdp }
+
+	if (synCa==1) {
+		insert KD_ca2
+		gmax_KD_ca2 = 1.0e-2
+		kD_ca_KD_ca2= 1.0e-3
+	} else if (synCa==2) {
+		insert CN
+		insert KD_cn
+		gmax_KD_cn = 2.0e-2
+	} else if (synCa==3) {
+		insert KD_ca3
+		gmax_KD_ca3 = 1.0e-2
+	} else if (synCa>3) {
+		insert CN
+		insert KD_cn2
+		gmax_KD_cn2 = 4.0e-2
+	} else if (synCa==-1) {
+		insert KD2
+		gmax_KD2 = 1.0e-3
+	} else {
+		insert KD
+		gmax_KD = 1.5e-3
+	}
+	ek = EK
+}
+
+FindBranches( ParentBranch, ChildBranch, FieldA)
+// forsec ParentBranch Ra=axial*4
+// MainTrunk[0].Ra=axial
+
+// Handle[40] distance()
+// forsec FieldA Ra = axial*1.8+0.1*distance(0.5)
+// for i=56,61 Handle[i].Ra=axial
+// forall diam=diam^0.9
+// forall diam=diam^0.8
+// forsec "Tines" {
+// 	diam=diam/2
+// 	L=L*2
+// }
+
+forsec TineEnds Ra=30
+if (Rabeforeg == 1) ZratioRa(FieldA, "Handle[60]", axial, 40)
+if (Rabeforeg == 3) ZratioRa(FieldA, "Handle[60]", axial, 0, 1)
+if (Rabeforeg == 4) { ZratioRa("n", "soma[0]", 35, 250, 1) forsec "Axon" Ra=35 }
+
+if (synCa > 3) {
+	{Handle[20] distance() forsec FieldA gmax_h_ca=0.38*gmax_h_ca*(distance(0.5)/450)^6}
+	Zratio_g( FieldA, "Handle[60]", "h_ca", 0, 0, 1, 1.35, 0.01 )
+} else if (synCa == 3) {
+	{Handle[20] distance() forsec FieldA gmax_hcn=0.48*gmax_hcn*(distance(0.5)/450)^6}
+	Zratio_g( FieldA, "Handle[60]", "hcn", 0, 0, 1, 1.2, 0.01 )
+} else {
+	{Handle[25] distance() forsec FieldA gmax_h=0.53*gmax_h*(distance(0.5)/450)^6}
+	Zratio_g( FieldA, "Handle[60]", "h", 0, 0, 1, 1.7, 0.01 )
+}
+
+// forsec FieldA gmax_KA = 2.0e-5 + gmax_h*6
+// Handle[25] distance()
+// forsec FieldA gmax_KA = 0.2e-5*distance(0.5)
+
+// zn_KA=7.5
+// tnmin_KA=1.5
+// tnmax_KA=5
+// vl2_KA=-34
+// tlmax_KA=75
+// tlmin_KA=6
+// tls_KA=10
+// zl_KA=-5.5
+// vhalfn_KA=-35
+// vhalfl_KA=-41
+
+if (synCa==1) {
+forsec FieldA gmax_KD_ca2= 8e-3 + gmax_h*100
+tnmax_KD_ca2=4000
+tns_KD_ca2=-5.3
+tls_KD_ca2=15
+vn2_KD_ca2=-70
+tnmin_KD_ca2=1.5
+tauc_KD_ca2=1.5
+cap_KD_ca2=0.0
+zn_KD_ca2=5.2
+zl_KD_ca2=-2.4
+vhalfl_KD_ca2=-63.5
+vhalfn_KD_ca2=-38
+vl2_KD_ca2=-52
+tlmax_KD_ca2=450
+
+} else if (synCa==2) {
+forsec FieldA gmax_KD_cn= 1e-4 + gmax_h*14
+
+kD_KD_cn= 2.5e-4
+tnmax_KD_cn=15
+tns_KD_cn=-7.5
+tls_KD_cn=14
+vn2_KD_cn=-62
+tnmin_KD_cn=1.5
+zn_KD_cn=5.7
+zl_KD_cn=-3.6
+vhalfl_KD_cn=-67.5
+vhalfn_KD_cn=-54
+np_KD_cn=2
+vl2_KD_cn=-75
+tlmin_KD_cn=50
+tlmax_KD_cn=2000
+
+
+} else if (synCa>3) {
+if (synCa==4) forsec FieldA gmax_KD_cn2= 7e-3 + gmax_h*250
+if (synCa>4) forsec FieldA gmax_KD_cn2= 2e-4 + gmax_h_ca*160
+
+tnmax_KD_cn2=30
+tns_KD_cn2=-5.5
+tls_KD_cn2=15
+vn2_KD_cn2=-60
+tnmin_KD_cn2=1.0
+zn_KD_cn2=6.8
+zl_KD_cn2=-3.5
+vhalfl_KD_cn2=-69.5
+vhalfn_KD_cn2=-47
+np_KD_cn2=2.0
+vl2_KD_cn2=-72
+kD_KD_cn2 = 2.5e-4
+tlmin_KD_cn2=50
+tlmax_KD_cn2=1500
+
+} else if (synCa==3) {
+forsec FieldA gmax_KD_ca3= 1e-4 + gmax_hcn*22
+
+cavm_KD_ca3=16
+kD_KD_ca3=4e-4
+tauca_KD_ca3=100
+
+tnmax_KD_ca3=100
+tns_KD_ca3=-5.5
+tls_KD_ca3=16
+tnmin_KD_ca3=1.0
+zn_KD_ca3=7.0
+zl_KD_ca3=-4.2
+vhalfl_KD_ca3=-64
+vhalfn_KD_ca3=-38
+vn2_KD_ca3=-70
+np_KD_ca3=1
+vl2_KD_ca3=-50
+tlmin_KD_ca3=100
+tlmax_KD_ca3=1200
+
+} else if (synCa==-1) {
+	forsec FieldA gmax_KD2= 2.5e-4 + gmax_h*6
+	np_KD2=3
+	Aan_KD2=4.4
+	Abn_KD2=0.05
+	kan_KD2=11.5
+	dan_KD2=-4
+	kbn_KD2=28
+	dbn_KD2=-42
+
+} else {
+// 	tmp = meanRm(FieldA,"h",1)
+// 	init()
+// 	forsec FieldA gmax_hcn = gmax_hcn*scale
+
+// 	Handle[15] distance()
+// 	forsec FieldA gmax_KD = 0.42e-5*distance(0.5)
+	forsec FieldA gmax_KD = 3.0e-5 + gmax_h*5.8
+
+	tnmax_KD=120
+	tnmin_KD=3
+	tns_KD=-5.0
+	vn2_KD=-72
+	zn_KD=8.9
+	zl_KD=-6.0
+	vhalfl_KD=-61
+	vhalfn_KD=-45
+	np_KD=1
+	vl2_KD=-80
+	tls_KD=15
+	tlmin_KD=250
+	tlmax_KD=3200
+
+}
+// if (synCa > 0) {
+// 	//DCa_cdp = 20.0
+// 	TotalPump_cdp = 8.5e-13
+// 	TotalBuffer_cdp=0.04
+// 	k1_cdp = 2.0
+// 	k3_cdp = 0.5
+// 
+// 	eca=ECa
+// }
+
+forsec "Field" {
+	Ra=axial
+	g_pas=gl*5
+	insert h
+	gmax_h = 3.6e-5
+
+	insert M
+	gmax_M = 8.0e-5
+	vhalf_M = -50
+// 	insert KdrF
+// 	gmax_KdrF = 3.0e-04
+// 	t1_HH_Kdr=7
+	ek=EK
+// 	e_pas=-63
+}
+for i=0,15 FieldB[i].Ra=axial*0.5
+
+for i=0,21 {
+	FieldC[i] {Chandle.append()}
+}
+for i=22,454 {
+	FieldC[i] {Ctines.append()}
+}
+
+Zratio_g(Ctines, "FieldC[4]", "M", 1.2e-5, 10, 1,2)
+Zratio_g("FieldB", "FieldB[3]", "M", 0.8e-5, 10,1,2)
+
+forsec Chandle {
+	Ra=axial*0.2
+	if (ismembrane("NaP")) uninsert NaP
+	if (ismembrane("h")) uninsert h
+// 	g_pas = gl
+	insert Na
+	gmax_Na = SIZNa/12
+// 	insert HH_Kdr
+// 	gmax_HH_Kdr= SIZKdr/2
+}
+
+forsec "CellBody"{
+// 	Ra=axial
+	insert M
+	gmax_M = 1.5e-4
+	vhalf_M = -50
+	g_pas=gl*4
+// 	insert NaP
+// 	gmax_NaP = 5.0e-5
+// 	insert Na
+// 	gmax_Na = SIZNa/10
+// 	insert HH_Kdr
+// 	gmax_HH_Kdr = SIZKdr/5
+// 	ek = EK
+}
+
+if (Rabeforeg == 7) {
+	ZratioRa( "Tines", "Handle[60]", axial, 0)
+	ZratioRa( "Tines", "Handle[60]", axial, 0)
+//	forsec "Tines" Ra = (axial+Ra)/2
+}
+if (Rabeforeg == 6) ZratioRa(FieldA, "Handle[60]", 120, 40, 1)
+//forsec FieldA if (Ra>300) Ra=300
+if (Rabeforeg == 0) ZratioRa(FieldA, "Handle[60]", axial, 0)
+if (Rabeforeg == 5) {
+	ZratioRa("Handle", "soma[0]", 30, 250, 1)
+	for i=62,175 Handle[i].Ra=35
+	ZratioRa(FieldA, "Handle[50]", 60, 100, 1)
+	forsec "Tines" if (Ra>300) Ra=300
+}
+
+if (synCa < 3) {
+	e_h=-40
+	vhalf_h=-77
+// 	taumin_h=15
+	s1_h=-13.5
+	s2_h=13
+} else if (synCa == 3) {
+	e_hcn=-40
+	vhalf_hcn=-78.2
+	taumin_hcn=15
+	s1_hcn=-12.5
+	s2_hcn=13
+
+	lcp_hcn = 2
+	cnvm_hcn = 15
+	kD_hcn = 6e-4
+} else {
+	e_h_ca=-35
+	vhalf_h_ca=-77.6
+	s1_h_ca=-12.5
+	s2_h_ca=13
+	cac_h_ca=0.01
+	taumin_h_ca=15
+	ginc_h_ca=1.1
+	Pc_h_ca=0.15
+}
+
+Tines[0] acn = ismembrane("CN")
+if  (acn) {
+	cn_init_CN = 2e-5
+	kD_CN = 0.05
+	minca_CN = 1.5e-4
+	tau_ca_CN = 1500
+	tau_CN = 6000
+}
+
+
+}
+
+forall if (ismembrane("HH_Kdr")) t1_HH_Kdr=120
+
+forall {
+	if (ismembrane(Hname)) HList.append()
+	if (ismembrane(KDname)) KDList.append()
+	if (ismembrane("KA")) KAList.append()
+	if (ismembrane("CaT")) CaTList.append()
+	if (ismembrane("M")) MList.append()
+}
+
+

@@ -1,0 +1,3139 @@
+create BranchA[85]
+create BranchB[95]
+create BranchC[95]
+nseg=1
+
+BranchA[0] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 22.5653	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 130.765
+}
+Handle[61] connect BranchA[0](0), 1
+BranchA[1] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 18.1002	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 93.3215
+}
+BranchA[0] connect BranchA[1](0), 1
+
+BranchA[2] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 18.1784	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 95.6321
+}
+BranchA[1] connect BranchA[2](0), 1
+
+BranchA[3] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 18.9171	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 130.911
+}
+BranchA[2] connect BranchA[3](0), 1
+
+BranchA[4] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 19.819	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 135.737
+}
+BranchA[3] connect BranchA[4](0), 1
+
+BranchA[5] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 19.6947	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 187.636
+}
+BranchA[4] connect BranchA[5](0), 1
+
+BranchA[6] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 15.976	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 154.83
+}
+BranchA[5] connect BranchA[6](0), 1
+
+BranchA[7] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 14.9054	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 135.793
+}
+BranchA[6] connect BranchA[7](0), 1
+
+BranchA[8] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 14.1156	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 143.147
+}
+BranchA[7] connect BranchA[8](0), 1
+
+BranchA[9] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 12.4122	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 127.797
+}
+BranchA[8] connect BranchA[9](0), 1
+
+BranchA[10] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 11.2325	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 109.807
+}
+BranchA[9] connect BranchA[10](0), 1
+
+BranchA[11] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 10.2245	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 85.1025
+}
+BranchA[10] connect BranchA[11](0), 1
+
+BranchA[12] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 9.75679	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 93.6029
+}
+BranchA[11] connect BranchA[12](0), 1
+
+BranchA[13] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 9.18412	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 83.9878
+}
+BranchA[12] connect BranchA[13](0), 1
+
+BranchA[14] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 8.8368	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 86.036
+}
+BranchA[13] connect BranchA[14](0), 1
+
+BranchA[15] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 8.46546	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 84.6942
+}
+BranchA[14] connect BranchA[15](0), 1
+
+BranchA[16] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 8.1074	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 90.2257
+}
+BranchA[15] connect BranchA[16](0), 1
+
+BranchA[17] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 7.95246	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 79.4977
+}
+BranchA[16] connect BranchA[17](0), 1
+
+BranchA[18] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 7.88199	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 89.7269
+}
+BranchA[17] connect BranchA[18](0), 1
+
+BranchA[19] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 7.76507	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 85.0456
+}
+BranchA[18] connect BranchA[19](0), 1
+
+BranchA[20] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 7.52312	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 80.165
+}
+BranchA[19] connect BranchA[20](0), 1
+
+BranchA[21] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 7.26821	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 79.6776
+}
+BranchA[20] connect BranchA[21](0), 1
+
+BranchA[22] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 7.21059	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 82.1618
+}
+BranchA[21] connect BranchA[22](0), 1
+
+BranchA[23] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 6.95746	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 78.8507
+}
+BranchA[22] connect BranchA[23](0), 1
+
+BranchA[24] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 6.74359	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 85.1171
+}
+BranchA[23] connect BranchA[24](0), 1
+
+BranchA[25] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 6.50983	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 70.9285
+}
+BranchA[24] connect BranchA[25](0), 1
+
+BranchA[26] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 6.23236	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 68.5186
+}
+BranchA[25] connect BranchA[26](0), 1
+
+BranchA[27] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 5.92923	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 57.6284
+}
+BranchA[26] connect BranchA[27](0), 1
+
+BranchA[28] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 5.60907	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 61.0142
+}
+BranchA[27] connect BranchA[28](0), 1
+
+BranchA[29] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 5.31813	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 49.5536
+}
+BranchA[28] connect BranchA[29](0), 1
+
+BranchA[30] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 5.11291	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 49.1252
+}
+BranchA[29] connect BranchA[30](0), 1
+
+BranchA[31] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 4.94112	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 49.5862
+}
+BranchA[30] connect BranchA[31](0), 1
+
+BranchA[32] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 4.79061	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 46.6592
+}
+BranchA[31] connect BranchA[32](0), 1
+
+BranchA[33] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 4.6055	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 36.5529
+}
+BranchA[32] connect BranchA[33](0), 1
+
+BranchA[34] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 4.41908	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 35.785
+}
+BranchA[33] connect BranchA[34](0), 1
+
+BranchA[35] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 4.31769	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 35.1706
+}
+BranchA[34] connect BranchA[35](0), 1
+
+BranchA[36] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 4.08956	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 23.3931
+}
+BranchA[35] connect BranchA[36](0), 1
+
+BranchA[37] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.99262	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 34.0327
+}
+BranchA[36] connect BranchA[37](0), 1
+
+BranchA[38] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.87251	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 21.3763
+}
+BranchA[37] connect BranchA[38](0), 1
+
+BranchA[39] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.69377	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 16.283
+}
+BranchA[38] connect BranchA[39](0), 1
+
+BranchA[40] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.5315	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 15.792
+}
+BranchA[39] connect BranchA[40](0), 1
+
+BranchA[41] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.26015	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 17.3259
+}
+BranchA[40] connect BranchA[41](0), 1
+
+BranchA[42] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.10945	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 11.2419
+}
+BranchA[41] connect BranchA[42](0), 1
+
+BranchA[43] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.96752	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 8.64515
+}
+BranchA[42] connect BranchA[43](0), 1
+
+BranchA[44] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.83605	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 10.1264
+}
+BranchA[43] connect BranchA[44](0), 1
+
+BranchA[45] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.72545	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 7.62195
+}
+BranchA[44] connect BranchA[45](0), 1
+
+BranchA[46] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.64607	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 7.71204
+}
+BranchA[45] connect BranchA[46](0), 1
+
+BranchA[47] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.55671	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 8.81357
+}
+BranchA[46] connect BranchA[47](0), 1
+
+BranchA[48] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.42827	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 6.66507
+}
+BranchA[47] connect BranchA[48](0), 1
+
+BranchA[49] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.3571	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 7.60873
+}
+BranchA[48] connect BranchA[49](0), 1
+
+BranchA[50] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.33547	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 8
+}
+BranchA[49] connect BranchA[50](0), 1
+
+BranchA[51] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.30231	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 4.16017
+}
+BranchA[50] connect BranchA[51](0), 1
+
+BranchA[52] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.26375	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 5.03968
+}
+BranchA[51] connect BranchA[52](0), 1
+
+BranchA[53] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.2176	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 3.1748
+}
+BranchA[52] connect BranchA[53](0), 1
+
+BranchA[54] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.16941	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 6.60385
+}
+BranchA[53] connect BranchA[54](0), 1
+
+BranchA[55] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.15768	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 3.1748
+}
+BranchA[54] connect BranchA[55](0), 1
+
+BranchA[56] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.11878	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 5.84804
+}
+BranchA[55] connect BranchA[56](0), 1
+
+BranchA[57] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.09086	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 4.16017
+}
+BranchA[56] connect BranchA[57](0), 1
+
+BranchA[58] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.08813	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 3.1748
+}
+BranchA[57] connect BranchA[58](0), 1
+
+BranchA[59] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.05029	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 4.56105
+}
+BranchA[58] connect BranchA[59](0), 1
+
+BranchA[60] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.06196	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 6.55908
+}
+BranchA[59] connect BranchA[60](0), 1
+
+BranchA[61] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.08222	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 2.89
+}
+BranchA[60] connect BranchA[61](0), 1
+
+BranchA[62] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.08633	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 4.39853
+}
+BranchA[61] connect BranchA[62](0), 1
+
+BranchA[63] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.08369	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 2
+}
+BranchA[62] connect BranchA[63](0), 1
+
+BranchA[64] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.0901	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 2
+}
+BranchA[63] connect BranchA[64](0), 1
+
+BranchA[65] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.10145	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchA[64] connect BranchA[65](0), 1
+
+BranchA[66] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.10488	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchA[65] connect BranchA[66](0), 1
+
+BranchA[67] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.11431	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchA[66] connect BranchA[67](0), 1
+
+BranchA[68] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.11732	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchA[67] connect BranchA[68](0), 1
+
+BranchA[69] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.12474	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchA[68] connect BranchA[69](0), 1
+
+BranchA[70] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.13396	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchA[69] connect BranchA[70](0), 1
+
+BranchA[71] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.1431	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchA[70] connect BranchA[71](0), 1
+
+BranchA[72] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.1431	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchA[71] connect BranchA[72](0), 1
+
+BranchA[73] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.19694	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchA[72] connect BranchA[73](0), 1
+
+BranchA[74] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.20132	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchA[73] connect BranchA[74](0), 1
+
+BranchA[75] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.27127	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchA[74] connect BranchA[75](0), 1
+
+BranchA[76] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.15503	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchA[75] connect BranchA[76](0), 1
+
+BranchA[77] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.15503	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchA[76] connect BranchA[77](0), 1
+
+BranchA[78] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.04597	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchA[77] connect BranchA[78](0), 1
+
+BranchA[79] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.06501	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchA[78] connect BranchA[79](0), 1
+
+BranchA[80] {
+L = 1
+Ra = 1
+insert morphology { diam =      2	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchA[79] connect BranchA[80](0), 1
+
+BranchA[81] {
+L = 1
+Ra = 1
+insert morphology { diam =      2	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchA[80] connect BranchA[81](0), 1
+
+BranchA[82] {
+L = 1
+Ra = 1
+insert morphology { diam =      2	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchA[81] connect BranchA[82](0), 1
+
+BranchA[83] {
+L = 1
+Ra = 1
+insert morphology { diam =      2	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchA[82] connect BranchA[83](0), 1
+
+BranchA[84] {
+L = 1
+Ra = 1
+insert morphology { diam =      2	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchA[83] connect BranchA[84](0), 1
+
+BranchB[0] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 11.375	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 11.375
+}
+Handle[35] connect BranchB[0](0), 1
+BranchB[1] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 10.2498	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 7.935
+}
+BranchB[0] connect BranchB[1](0), 1
+
+BranchB[2] {
+L = 1
+Ra = 1
+insert morphology { diam =  7.935	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[1] connect BranchB[2](0), 1
+
+BranchB[3] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 7.31407	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 6.56
+}
+BranchB[2] connect BranchB[3](0), 1
+
+BranchB[4] {
+L = 1
+Ra = 1
+insert morphology { diam =   6.56	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[3] connect BranchB[4](0), 1
+
+BranchB[5] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 6.23719	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 5.875
+}
+BranchB[4] connect BranchB[5](0), 1
+
+BranchB[6] {
+L = 1
+Ra = 1
+insert morphology { diam =  5.875	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[5] connect BranchB[6](0), 1
+
+BranchB[7] {
+L = 1
+Ra = 1
+insert morphology { diam =  5.875	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[6] connect BranchB[7](0), 1
+
+BranchB[8] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 5.90491	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 5.935
+}
+BranchB[7] connect BranchB[8](0), 1
+
+BranchB[9] {
+L = 1
+Ra = 1
+insert morphology { diam =  5.935	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[8] connect BranchB[9](0), 1
+
+BranchB[10] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 6.19845	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 6.435
+}
+BranchB[9] connect BranchB[10](0), 1
+
+BranchB[11] {
+L = 1
+Ra = 1
+insert morphology { diam =  6.435	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[10] connect BranchB[11](0), 1
+
+BranchB[12] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 6.80002	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 7.125
+}
+BranchB[11] connect BranchB[12](0), 1
+
+BranchB[13] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 7.46036	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 7.75
+}
+BranchB[12] connect BranchB[13](0), 1
+
+BranchB[14] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 7.72251	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 8.19
+}
+BranchB[13] connect BranchB[14](0), 1
+
+BranchB[15] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 8.01402	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 8.19
+}
+BranchB[14] connect BranchB[15](0), 1
+
+BranchB[16] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 8.58571	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 9
+}
+BranchB[15] connect BranchB[16](0), 1
+
+BranchB[17] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 10.382	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 17.9741
+}
+BranchB[16] connect BranchB[17](0), 1
+
+BranchB[18] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 12.5795	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 91.2617
+}
+BranchB[17] connect BranchB[18](0), 1
+
+BranchB[19] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 12.4487	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 40.2987
+}
+BranchB[18] connect BranchB[19](0), 1
+
+BranchB[20] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 11.3672	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 28.9428
+}
+BranchB[19] connect BranchB[20](0), 1
+
+BranchB[21] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 9.22336	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 28.2042
+}
+BranchB[20] connect BranchB[21](0), 1
+
+BranchB[22] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 7.88679	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 25.4637
+}
+BranchB[21] connect BranchB[22](0), 1
+
+BranchB[23] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 7.47403	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 32.1259
+}
+BranchB[22] connect BranchB[23](0), 1
+
+BranchB[24] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 6.63775	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 34.5256
+}
+BranchB[23] connect BranchB[24](0), 1
+
+BranchB[25] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 6.17143	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 23.7059
+}
+BranchB[24] connect BranchB[25](0), 1
+
+BranchB[26] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 5.7403	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 26.8379
+}
+BranchB[25] connect BranchB[26](0), 1
+
+BranchB[27] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 5.71687	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 22.2052
+}
+BranchB[26] connect BranchB[27](0), 1
+
+BranchB[28] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 5.37367	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 23.7927
+}
+BranchB[27] connect BranchB[28](0), 1
+
+BranchB[29] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 5.13703	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 18.0193
+}
+BranchB[28] connect BranchB[29](0), 1
+
+BranchB[30] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 4.7693	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 20.165
+}
+BranchB[29] connect BranchB[30](0), 1
+
+BranchB[31] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 4.42698	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 21.4296
+}
+BranchB[30] connect BranchB[31](0), 1
+
+BranchB[32] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 4.38964	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 20.7431
+}
+BranchB[31] connect BranchB[32](0), 1
+
+BranchB[33] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 4.19852	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 21.9624
+}
+BranchB[32] connect BranchB[33](0), 1
+
+BranchB[34] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 4.09735	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 17.4962
+}
+BranchB[33] connect BranchB[34](0), 1
+
+BranchB[35] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.94625	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 17.9502
+}
+BranchB[34] connect BranchB[35](0), 1
+
+BranchB[36] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.75819	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 21.3234
+}
+BranchB[35] connect BranchB[36](0), 1
+
+BranchB[37] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.68348	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 15.9459
+}
+BranchB[36] connect BranchB[37](0), 1
+
+BranchB[38] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.57722	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 18.3804
+}
+BranchB[37] connect BranchB[38](0), 1
+
+BranchB[39] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.52868	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 14.7027
+}
+BranchB[38] connect BranchB[39](0), 1
+
+BranchB[40] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.53493	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 19.2747
+}
+BranchB[39] connect BranchB[40](0), 1
+
+BranchB[41] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.49397	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 20.9652
+}
+BranchB[40] connect BranchB[41](0), 1
+
+BranchB[42] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.38088	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 12.5847
+}
+BranchB[41] connect BranchB[42](0), 1
+
+BranchB[43] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.30824	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 15.0092
+}
+BranchB[42] connect BranchB[43](0), 1
+
+BranchB[44] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.30766	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 18.0374
+}
+BranchB[43] connect BranchB[44](0), 1
+
+BranchB[45] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.25726	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 11.9654
+}
+BranchB[44] connect BranchB[45](0), 1
+
+BranchB[46] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.13043	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 11.9989
+}
+BranchB[45] connect BranchB[46](0), 1
+
+BranchB[47] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.11432	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 13.5833
+}
+BranchB[46] connect BranchB[47](0), 1
+
+BranchB[48] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.05964	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 9.97506
+}
+BranchB[47] connect BranchB[48](0), 1
+
+BranchB[49] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.04239	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 9.37114
+}
+BranchB[48] connect BranchB[49](0), 1
+
+BranchB[50] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.01516	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 11.3499
+}
+BranchB[49] connect BranchB[50](0), 1
+
+BranchB[51] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.78143	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 15.0325
+}
+BranchB[50] connect BranchB[51](0), 1
+
+BranchB[52] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.71771	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 8.69413
+}
+BranchB[51] connect BranchB[52](0), 1
+
+BranchB[53] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.69991	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 7.70682
+}
+BranchB[52] connect BranchB[53](0), 1
+
+BranchB[54] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.64639	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 6.66507
+}
+BranchB[53] connect BranchB[54](0), 1
+
+BranchB[55] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.57571	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 8.18055
+}
+BranchB[54] connect BranchB[55](0), 1
+
+BranchB[56] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.56349	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 7.97418
+}
+BranchB[55] connect BranchB[56](0), 1
+
+BranchB[57] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.53516	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[56] connect BranchB[57](0), 1
+
+BranchB[58] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.46789	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 3.1748
+}
+BranchB[57] connect BranchB[58](0), 1
+
+BranchB[59] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.43007	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 3.62872
+}
+BranchB[58] connect BranchB[59](0), 1
+
+BranchB[60] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.40401	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[59] connect BranchB[60](0), 1
+
+BranchB[61] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.38581	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 5.18103
+}
+BranchB[60] connect BranchB[61](0), 1
+
+BranchB[62] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.28544	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 2
+}
+BranchB[61] connect BranchB[62](0), 1
+
+BranchB[63] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.28308	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 2
+}
+BranchB[62] connect BranchB[63](0), 1
+
+BranchB[64] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.26415	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 2
+}
+BranchB[63] connect BranchB[64](0), 1
+
+BranchB[65] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.25862	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 2
+}
+BranchB[64] connect BranchB[65](0), 1
+
+BranchB[66] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.17834	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 2
+}
+BranchB[65] connect BranchB[66](0), 1
+
+BranchB[67] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.13102	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 2
+}
+BranchB[66] connect BranchB[67](0), 1
+
+BranchB[68] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.13801	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[67] connect BranchB[68](0), 1
+
+BranchB[69] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.07493	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 2
+}
+BranchB[68] connect BranchB[69](0), 1
+
+BranchB[70] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.07985	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[69] connect BranchB[70](0), 1
+
+BranchB[71] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.08672	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[70] connect BranchB[71](0), 1
+
+BranchB[72] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.05161	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[71] connect BranchB[72](0), 1
+
+BranchB[73] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.05161	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[72] connect BranchB[73](0), 1
+
+BranchB[74] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.05493	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[73] connect BranchB[74](0), 1
+
+BranchB[75] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.02511	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[74] connect BranchB[75](0), 1
+
+BranchB[76] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.03329	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[75] connect BranchB[76](0), 1
+
+BranchB[77] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.04755	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[76] connect BranchB[77](0), 1
+
+BranchB[78] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.05019	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[77] connect BranchB[78](0), 1
+
+BranchB[79] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.05368	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[78] connect BranchB[79](0), 1
+
+BranchB[80] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.0613	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[79] connect BranchB[80](0), 1
+
+BranchB[81] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.0677	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[80] connect BranchB[81](0), 1
+
+BranchB[82] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.0677	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[81] connect BranchB[82](0), 1
+
+BranchB[83] {
+L = 1
+Ra = 1
+insert morphology { diam =      2	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[82] connect BranchB[83](0), 1
+
+BranchB[84] {
+L = 1
+Ra = 1
+insert morphology { diam =      2	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[83] connect BranchB[84](0), 1
+
+BranchB[85] {
+L = 1
+Ra = 1
+insert morphology { diam =      2	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[84] connect BranchB[85](0), 1
+
+BranchB[86] {
+L = 1
+Ra = 1
+insert morphology { diam =      2	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[85] connect BranchB[86](0), 1
+
+BranchB[87] {
+L = 1
+Ra = 1
+insert morphology { diam =      2	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[86] connect BranchB[87](0), 1
+
+BranchB[88] {
+L = 1
+Ra = 1
+insert morphology { diam =      2	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[87] connect BranchB[88](0), 1
+
+BranchB[89] {
+L = 1
+Ra = 1
+insert morphology { diam =      2	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[88] connect BranchB[89](0), 1
+
+BranchB[90] {
+L = 1
+Ra = 1
+insert morphology { diam =      2	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[89] connect BranchB[90](0), 1
+
+BranchB[91] {
+L = 1
+Ra = 1
+insert morphology { diam =      2	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[90] connect BranchB[91](0), 1
+
+BranchB[92] {
+L = 1
+Ra = 1
+insert morphology { diam =      2	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[91] connect BranchB[92](0), 1
+
+BranchB[93] {
+L = 1
+Ra = 1
+insert morphology { diam =      2	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[92] connect BranchB[93](0), 1
+
+BranchB[94] {
+L = 1
+Ra = 1
+insert morphology { diam =      2	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchB[93] connect BranchB[94](0), 1
+
+BranchC[0] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 10.0327	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 16.6103
+}
+Handle[25] connect BranchC[0](0), 1
+BranchC[1] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 8.2678	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 7.335
+}
+BranchC[0] connect BranchC[1](0), 1
+
+BranchC[2] {
+L = 1
+Ra = 1
+insert morphology { diam = 8.2678	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[1] connect BranchC[2](0), 1
+
+BranchC[3] {
+L = 1
+Ra = 1
+insert morphology { diam =  7.335	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[2] connect BranchC[3](0), 1
+
+BranchC[4] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 6.88732	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 6.445
+}
+BranchC[3] connect BranchC[4](0), 1
+
+BranchC[5] {
+L = 1
+Ra = 1
+insert morphology { diam =  6.445	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[4] connect BranchC[5](0), 1
+
+BranchC[6] {
+L = 1
+Ra = 1
+insert morphology { diam =  6.445	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[5] connect BranchC[6](0), 1
+
+BranchC[7] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 6.38782	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 6.33
+}
+BranchC[6] connect BranchC[7](0), 1
+
+BranchC[8] {
+L = 1
+Ra = 1
+insert morphology { diam = 6.38782	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[7] connect BranchC[8](0), 1
+
+BranchC[9] {
+L = 1
+Ra = 1
+insert morphology { diam =   6.33	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[8] connect BranchC[9](0), 1
+
+BranchC[10] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 6.4842	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 6.665
+}
+BranchC[9] connect BranchC[10](0), 1
+
+BranchC[11] {
+L = 1
+Ra = 1
+insert morphology { diam = 6.4842	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[10] connect BranchC[11](0), 1
+
+BranchC[12] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 6.81383	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 7
+}
+BranchC[11] connect BranchC[12](0), 1
+
+BranchC[13] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 7.07751	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 7.555
+}
+BranchC[12] connect BranchC[13](0), 1
+
+BranchC[14] {
+L = 1
+Ra = 1
+insert morphology { diam = 7.30756	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[13] connect BranchC[14](0), 1
+
+BranchC[15] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 7.78994	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 12.6992
+}
+BranchC[14] connect BranchC[15](0), 1
+
+BranchC[16] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 7.91978	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 12.8744
+}
+BranchC[15] connect BranchC[16](0), 1
+
+BranchC[17] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 8.27081	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 8.775
+}
+BranchC[16] connect BranchC[17](0), 1
+
+BranchC[18] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 9.46951	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 16.0564
+}
+BranchC[17] connect BranchC[18](0), 1
+
+BranchC[19] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 10.8518	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 24.122
+}
+BranchC[18] connect BranchC[19](0), 1
+
+BranchC[20] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 11.9459	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 26.4366
+}
+BranchC[19] connect BranchC[20](0), 1
+
+BranchC[21] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 13.6096	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 57.1331
+}
+BranchC[20] connect BranchC[21](0), 1
+
+BranchC[22] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 13.1388	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 47.044
+}
+BranchC[21] connect BranchC[22](0), 1
+
+BranchC[23] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 11.8817	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 50.4673
+}
+BranchC[22] connect BranchC[23](0), 1
+
+BranchC[24] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 10.6048	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 47.7251
+}
+BranchC[23] connect BranchC[24](0), 1
+
+BranchC[25] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 9.23561	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 43.4101
+}
+BranchC[24] connect BranchC[25](0), 1
+
+BranchC[26] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 8.26543	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 45.7995
+}
+BranchC[25] connect BranchC[26](0), 1
+
+BranchC[27] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 7.41432	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 38.2519
+}
+BranchC[26] connect BranchC[27](0), 1
+
+BranchC[28] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 6.92289	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 36.2087
+}
+BranchC[27] connect BranchC[28](0), 1
+
+BranchC[29] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 6.61991	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 35.2318
+}
+BranchC[28] connect BranchC[29](0), 1
+
+BranchC[30] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 6.16868	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 37.795
+}
+BranchC[29] connect BranchC[30](0), 1
+
+BranchC[31] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 5.80489	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 42.7753
+}
+BranchC[30] connect BranchC[31](0), 1
+
+BranchC[32] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 5.67617	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 33.3553
+}
+BranchC[31] connect BranchC[32](0), 1
+
+BranchC[33] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 5.61597	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 39.5438
+}
+BranchC[32] connect BranchC[33](0), 1
+
+BranchC[34] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 5.54311	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 32.4686
+}
+BranchC[33] connect BranchC[34](0), 1
+
+BranchC[35] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 5.22358	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 27.6392
+}
+BranchC[34] connect BranchC[35](0), 1
+
+BranchC[36] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 4.98287	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 28.4879
+}
+BranchC[35] connect BranchC[36](0), 1
+
+BranchC[37] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 4.79612	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 25.9572
+}
+BranchC[36] connect BranchC[37](0), 1
+
+BranchC[38] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 4.54988	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 27.4734
+}
+BranchC[37] connect BranchC[38](0), 1
+
+BranchC[39] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 4.45062	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 23.4363
+}
+BranchC[38] connect BranchC[39](0), 1
+
+BranchC[40] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 4.37181	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 20.1959
+}
+BranchC[39] connect BranchC[40](0), 1
+
+BranchC[41] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 4.28321	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 27.1638
+}
+BranchC[40] connect BranchC[41](0), 1
+
+BranchC[42] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 4.00345	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 14.0283
+}
+BranchC[41] connect BranchC[42](0), 1
+
+BranchC[43] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.77283	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 17.8859
+}
+BranchC[42] connect BranchC[43](0), 1
+
+BranchC[44] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.64058	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 12.4335
+}
+BranchC[43] connect BranchC[44](0), 1
+
+BranchC[45] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.53021	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 8.80585
+}
+BranchC[44] connect BranchC[45](0), 1
+
+BranchC[46] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.38845	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 10.9295
+}
+BranchC[45] connect BranchC[46](0), 1
+
+BranchC[47] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.2955	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 13.4203
+}
+BranchC[46] connect BranchC[47](0), 1
+
+BranchC[48] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.21981	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 8.74696
+}
+BranchC[47] connect BranchC[48](0), 1
+
+BranchC[49] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.13489	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 6.64884
+}
+BranchC[48] connect BranchC[49](0), 1
+
+BranchC[50] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.07409	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 9.99922
+}
+BranchC[49] connect BranchC[50](0), 1
+
+BranchC[51] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.0186	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 5.55679
+}
+BranchC[50] connect BranchC[51](0), 1
+
+BranchC[52] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 3.0005	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 10.5517
+}
+BranchC[51] connect BranchC[52](0), 1
+
+BranchC[53] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.95394	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 5.0591
+}
+BranchC[52] connect BranchC[53](0), 1
+
+BranchC[54] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.93344	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 7.19788
+}
+BranchC[53] connect BranchC[54](0), 1
+
+BranchC[55] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.82765	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 7.13776
+}
+BranchC[54] connect BranchC[55](0), 1
+
+BranchC[56] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.79208	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 6.24597
+}
+BranchC[55] connect BranchC[56](0), 1
+
+BranchC[57] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.72503	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 3.26269
+}
+BranchC[56] connect BranchC[57](0), 1
+
+BranchC[58] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.6597	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 4.47925
+}
+BranchC[57] connect BranchC[58](0), 1
+
+BranchC[59] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.63919	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[58] connect BranchC[59](0), 1
+
+BranchC[60] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.5794	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 5.16762
+}
+BranchC[59] connect BranchC[60](0), 1
+
+BranchC[61] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.58508	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 3.34942
+}
+BranchC[60] connect BranchC[61](0), 1
+
+BranchC[62] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.55309	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 2.445
+}
+BranchC[61] connect BranchC[62](0), 1
+
+BranchC[63] {
+L = 8.32
+Ra = 350
+insert morphology { diam =  2.417	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 5.37901
+}
+BranchC[62] connect BranchC[63](0), 1
+
+BranchC[64] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.44356	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 9.38691
+}
+BranchC[63] connect BranchC[64](0), 1
+
+BranchC[65] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.45161	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 3.62872
+}
+BranchC[64] connect BranchC[65](0), 1
+
+BranchC[66] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.47934	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 2
+}
+BranchC[65] connect BranchC[66](0), 1
+
+BranchC[67] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.40243	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 2.67
+}
+BranchC[66] connect BranchC[67](0), 1
+
+BranchC[68] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.40837	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 2.78
+}
+BranchC[67] connect BranchC[68](0), 1
+
+BranchC[69] {
+L = 8.32
+Ra = 350
+insert morphology { diam = 2.49273	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 5.38634
+}
+BranchC[68] connect BranchC[69](0), 1
+
+BranchC[70] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.52426	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[69] connect BranchC[70](0), 1
+
+BranchC[71] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.5752	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[70] connect BranchC[71](0), 1
+
+BranchC[72] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.58227	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[71] connect BranchC[72](0), 1
+
+BranchC[73] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.58227	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[72] connect BranchC[73](0), 1
+
+BranchC[74] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.62261	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[73] connect BranchC[74](0), 1
+
+BranchC[75] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.66813	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[74] connect BranchC[75](0), 1
+
+BranchC[76] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.71446	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[75] connect BranchC[76](0), 1
+
+BranchC[77] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.78094	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[76] connect BranchC[77](0), 1
+
+BranchC[78] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.80163	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[77] connect BranchC[78](0), 1
+
+BranchC[79] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.80163	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[78] connect BranchC[79](0), 1
+
+BranchC[80] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.86917	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[79] connect BranchC[80](0), 1
+
+BranchC[81] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.86819	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[80] connect BranchC[81](0), 1
+
+BranchC[82] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.80139	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[81] connect BranchC[82](0), 1
+
+BranchC[83] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.73502	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[82] connect BranchC[83](0), 1
+
+BranchC[84] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.73502	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[83] connect BranchC[84](0), 1
+
+BranchC[85] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.80178	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[84] connect BranchC[85](0), 1
+
+BranchC[86] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.80178	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[85] connect BranchC[86](0), 1
+
+BranchC[87] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.87855	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[86] connect BranchC[87](0), 1
+
+BranchC[88] {
+L = 1
+Ra = 1
+insert morphology { diam = 2.96825	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[87] connect BranchC[88](0), 1
+
+BranchC[89] {
+L = 1
+Ra = 1
+insert morphology { diam = 3.08055	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[88] connect BranchC[89](0), 1
+
+BranchC[90] {
+L = 1
+Ra = 1
+insert morphology { diam = 3.08055	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[89] connect BranchC[90](0), 1
+
+BranchC[91] {
+L = 1
+Ra = 1
+insert morphology { diam = 3.22639	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[90] connect BranchC[91](0), 1
+
+BranchC[92] {
+L = 1
+Ra = 1
+insert morphology { diam = 3.22639	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[91] connect BranchC[92](0), 1
+
+BranchC[93] {
+L = 1
+Ra = 1
+insert morphology { diam = 3.42218	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[92] connect BranchC[93](0), 1
+
+BranchC[94] {
+L = 1
+Ra = 1
+insert morphology { diam =  3.665	}
+insert capacitance { cm =    0.8	}
+insert pas { g_pas = 0.0001	}
+diam = 1
+}
+BranchC[93] connect BranchC[94](0), 1
+
+nai0_na_ion = 10
+nao0_na_ion = 140
+ki0_k_ion = 54.4
+ko0_k_ion = 2.5
+minf_hh = 0
+hinf_hh = 0
+ninf_hh = 0
+mtau_hh = 0
+htau_hh = 0
+ntau_hh = 0
+usetable_hh = 1
+cai0_ca_ion = 5e-05
+cao0_ca_ion = 2
+e_h_ca = -35
+cac_h_ca = 0.006
+k2_h_ca = 0.0001
+Pc_h_ca = 0.01
+k4_h_ca = 0.001
+nca_h_ca = 4
+nexp_h_ca = 1
+ginc_h_ca = 2
+vhalf_h_ca = -78
+vh2_h_ca = -85
+s1_h_ca = -13
+s2_h_ca = 14
+taumax_h_ca = 1020
+taumin_h_ca = 20
+ca_min_CaInternal = 1e-05
+ca_init_CaIn = 0.0001
+ca_min1_CaIn = 2e-05
+ca_min2_CaIn = 0.00014
+vhalf_CaL = -15
+vn2_CaL = -10
+s1_CaL = 3
+s2_CaL = 5
+tmax_CaL = 0.5
+tmin_CaL = 0.05
+usetable_CaL = 1
+vhalfm_CaS = -34
+vhalfh_CaS = -33
+vn2_CaS = -55
+s1_CaS = 10
+s2_CaS = -8
+tmax_CaS = 25
+tmin_CaS = 1
+kh_CaS = -5.5
+hb_CaS = -120
+hmin_CaS = 5
+tadj_CaS = 10
+hs_CaS = -40
+nic_CaS = 0
+mp_CaS = 2
+usetable_CaS = 1
+vhalf_CaT = -40
+thh_CaT = -64
+vn2_CaT = -50
+s1_CaT = 7.5
+s2_CaT = -8
+tmax_CaT = 80
+tmin_CaT = 5
+kh_CaT = -5.4
+hb_CaT = -100
+hmin_CaT = 30
+tadj_CaT = 20
+hs_CaT = -14
+nic_CaT = 0
+sp_CaT = 1
+usetable_CaT = 1
+cli0_cl_ion = 1
+clo0_cl_ion = 1
+cl_init_ClInternal = 5
+clo_ClInternal = 157
+vhalf_HH_Kdr = -39
+vn2_HH_Kdr = -60
+t2_HH_Kdr = 0.15
+tns_HH_Kdr = -9
+zn_HH_Kdr = 9
+usetable_HH_Kdr = 1
+s1_M = 15
+s2_M = -20
+taumax_M = 80
+taumin_M = 15
+aop_M = 0
+usetable_M = 1
+e_h = -35
+vhalf_h = -78
+s1_h = -13
+s2_h = 14
+taumin_h = 10
+usetable_h = 1
+vhalfn_KA = -40
+vn2_KA = -50
+tnmax_KA = 3.5
+tnmin_KA = 0.5
+tns_KA = -8
+zn_KA = 7.5
+np_KA = 1
+vhalfl_KA = -45
+vl2_KA = -50
+tlmax_KA = 35
+tlmin_KA = 3
+tls_KA = 12
+zl_KA = -5
+usetable_KA = 1
+kD_ca_KCa = 0.035
+tau_KCa = 1
+minca_KCa = 0.0005
+pwr_KCa = 1
+vhalfn_KD = -45
+vn2_KD = -60
+zn_KD = 7.8
+tnmax_KD = 25
+tnmin_KD = 1
+tns_KD = -6
+np_KD = 1
+vhalfl_KD = -68
+zl_KD = -5.1
+tlmax_KD = 2500
+tlmin_KD = 800
+vl2_KD = -67
+tls_KD = 14
+usetable_KD = 1
+np_KD2 = 3
+kan_KD2 = 10.5
+Aan_KD2 = 3
+dan_KD2 = -17
+kbn_KD2 = 30
+Abn_KD2 = 0.12
+dbn_KD2 = -50
+kal_KD2 = 35
+Aal_KD2 = 0.00025
+dal_KD2 = -85
+kbl_KD2 = 4.8
+Abl_KD2 = 0.0033
+dbl_KD2 = -51
+usetable_KD2 = 1
+vhalfn_KD_ca = -48
+vn2_KD_ca = -62
+zn_KD_ca = 5.5
+tnmax_KD_ca = 150
+tnmin_KD_ca = 3
+tns_KD_ca = -7
+vhalfl_KD_ca = -61.5
+zl_KD_ca = -3
+tlmax_KD_ca = 850
+tlmin_KD_ca = 20
+tauc_KD_ca = 30
+vl2_KD_ca = -66
+tls_KD_ca = 19
+lcp_KD_ca = 4
+usetable_KD_ca = 1
+vhalfn_KD_ca2 = -45
+vn2_KD_ca2 = -60
+zn_KD_ca2 = 7
+tnmax_KD_ca2 = 100
+tnmin_KD_ca2 = 3
+tns_KD_ca2 = -7.5
+vhalfl_KD_ca2 = -66
+zl_KD_ca2 = -2
+tlmax_KD_ca2 = 820
+tlmin_KD_ca2 = 20
+tauc_KD_ca2 = 30
+vl2_KD_ca2 = -63
+tls_KD_ca2 = 17
+cap_KD_ca2 = 0.6
+lcp_KD_ca2 = 6
+usetable_KD_ca2 = 1
+vhalfn_KD_ca3 = -49
+vn2_KD_ca3 = -60
+zn_KD_ca3 = 7
+tnmax_KD_ca3 = 10
+tnmin_KD_ca3 = 1.5
+tns_KD_ca3 = -5.5
+np_KD_ca3 = 2
+vhalfl_KD_ca3 = -70
+zl_KD_ca3 = -3.5
+tlmax_KD_ca3 = 1050
+tlmin_KD_ca3 = 70
+vl2_KD_ca3 = -75
+tls_KD_ca3 = 15
+cavm_KD_ca3 = 18
+lcp_KD_ca3 = 1
+kD_KD_ca3 = 0.0004
+tauca_KD_ca3 = 20
+usetable_KD_ca3 = 1
+cni0_cn_ion = 1
+cno0_cn_ion = 1
+vhalfn_KD_cn = -52
+vn2_KD_cn = -65
+zn_KD_cn = 6
+tnmax_KD_cn = 20
+tnmin_KD_cn = 1.5
+tns_KD_cn = -7.5
+np_KD_cn = 2
+vhalfl_KD_cn = -67
+zl_KD_cn = -3.6
+tlmax_KD_cn = 2000
+tlmin_KD_cn = 50
+vl2_KD_cn = -75
+tls_KD_cn = 14
+cntm_KD_cn = 50
+lcp_KD_cn = 2
+kD_KD_cn = 0.0003
+usetable_KD_cn = 1
+vhalfn_KD_cn2 = -52
+vn2_KD_cn2 = -65
+zn_KD_cn2 = 6
+tnmax_KD_cn2 = 20
+tnmin_KD_cn2 = 1.5
+tns_KD_cn2 = -7.5
+np_KD_cn2 = 2
+vhalfl_KD_cn2 = -67
+zl_KD_cn2 = -3.6
+tlmax_KD_cn2 = 2000
+tlmin_KD_cn2 = 50
+vl2_KD_cn2 = -75
+tls_KD_cn2 = 14
+cnvm_KD_cn2 = 25
+lcp_KD_cn2 = 1
+kD_KD_cn2 = 0.0003
+taucn_KD_cn2 = 20
+usetable_KD_cn2 = 1
+vhalf_KdrF = -39
+vn2_KdrF = -40
+vl_KdrF = -55
+tns_KdrF = 7
+zn_KdrF = 9
+zl_KdrF = -9
+usetable_KdrF = 1
+vhalf_Kdr_dend = -50
+tnmax_Kdr_dend = 2.5
+tnmin_Kdr_dend = 0.2
+tns_Kdr_dend = -30
+zn_Kdr_dend = 15
+usetable_Kdr_dend = 1
+kam_Na = 0.075
+Aam_Na = 26
+dam_Na = -10
+kbm_Na = 0.07
+Abm_Na = 7.4
+dbm_Na = -42
+kah_Na = 0.15
+Aah_Na = 2.1
+dah_Na = -60
+kbh_Na = 0.14
+Abh_Na = 8.5
+dbh_Na = -30
+usetable_Na = 1
+vhalfn_NaP = -51
+vhalfl_NaP = -58
+zn_NaP = 8.5
+zl_NaP = -4.4
+vn2_NaP = -52
+vl2_NaP = -55
+tlmax_NaP = 400
+tlmin_NaP = 0.5
+tls_NaP = 6.5
+tnmax_NaP = 20
+tnmin_NaP = 3
+tns_NaP = -8.5
+np_NaP = 3
+usetable_NaP = 1
+kam_HH_NaF = 0.25
+Aam_HH_NaF = 1.3
+dam_HH_NaF = -40
+kbm_HH_NaF = 0.1
+Abm_HH_NaF = 9
+dbm_HH_NaF = -60
+kah_HH_NaF = 0.08
+Aah_HH_NaF = 12
+dah_HH_NaF = -90
+kbh_HH_NaF = 0.15
+Abh_HH_NaF = 6
+dbh_HH_NaF = -40
+usetable_HH_NaF = 1
+tau_ca_CN = 1500
+tau_CN = 6000
+cn_init_CN = 2e-05
+kD_CN = 0.05
+minca_CN = 0.00015
+e_hcn = -37
+vhalf_hcn = -78.2
+s1_hcn = -12.5
+s2_hcn = 13
+taumin_hcn = 10
+cnvm_hcn = 15
+lcp_hcn = 2
+kD_hcn = 0.0006
+taucn_hcn = 10
+usetable_hcn = 1
+e_Lm = -65
+DCa_cdp = 0.8
+k1buf_cdp = 100
+k2buf_cdp = 0.1
+TotalBuffer_cdp = 0.003
+k1_cdp = 1
+k2_cdp = 0.005
+k3_cdp = 1
+k4_cdp = 0.005
+TotalPump_cdp = 1e-11
+vrat_cdp[0] = 0
+vrat_cdp[1] = 0
+vrat_cdp[2] = 0
+kl_hd = -8
+vhalft_hd = -75
+a0t_hd = 0.011
+zetat_hd = 2.2
+gmt_hd = 0.4
+q10_hd = 4.5
+qtl_hd = 1
+ehd_hd = -30
+vhalfn_kad = -1
+vhalfl_kad = -56
+a0l_kad = 0.05
+a0n_kad = 0.1
+zetan_kad = -1.8
+zetal_kad = 3
+gmn_kad = 0.39
+gml_kad = 1
+lmin_kad = 2
+nmin_kad = 0.2
+pw_kad = -1
+tq_kad = -40
+qq_kad = 5
+q10_kad = 5
+qtl_kad = 1
+vhalfn_kap = 11
+vhalfl_kap = -56
+a0l_kap = 0.05
+a0n_kap = 0.05
+zetan_kap = -1.5
+zetal_kap = 3
+gmn_kap = 0.55
+gml_kap = 1
+lmin_kap = 2
+nmin_kap = 0.1
+pw_kap = -1
+tq_kap = -40
+qq_kap = 5
+q10_kap = 5
+qtl_kap = 1
+vhalfn_kdr = 13
+a0n_kdr = 0.02
+zetan_kdr = -3
+gmn_kdr = 0.7
+nmax_kdr = 2
+q10_kdr = 1
+tha_na3 = -30
+qa_na3 = 7.2
+Ra_na3 = 0.4
+Rb_na3 = 0.124
+thi1_na3 = -45
+thi2_na3 = -45
+qd_na3 = 1.5
+qg_na3 = 1.5
+mmin_na3 = 0.02
+hmin_na3 = 0.5
+q10_na3 = 2
+Rg_na3 = 0.01
+Rd_na3 = 0.03
+qq_na3 = 10
+tq_na3 = -55
+thinf_na3 = -50
+qinf_na3 = 4
+vhalfs_na3 = -60
+a0s_na3 = 0.0003
+zetas_na3 = 12
+gms_na3 = 0.2
+smax_na3 = 10
+vvh_na3 = -58
+vvs_na3 = 2
+tha_nax = -30
+qa_nax = 7.2
+Ra_nax = 0.4
+Rb_nax = 0.124
+thi1_nax = -45
+thi2_nax = -45
+qd_nax = 1.5
+qg_nax = 1.5
+mmin_nax = 0.02
+hmin_nax = 0.5
+q10_nax = 2
+Rg_nax = 0.01
+Rd_nax = 0.03
+thinf_nax = -50
+qinf_nax = 4
+e_taupas = -65
