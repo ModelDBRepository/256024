@@ -10,6 +10,7 @@ xpanel("Dewell & Gabbiani 2019 J Neurophysiol")
   xlabel("Choose a simulation and then quit and restart to try another")
 // For simulations measuring synaptic timing discrimination shown in figure 8:
   xlabel("** Synaptic timing discrimination **")
+  xlabel("** 25 ms jitter plotted (Fig. 8A), 0-50 ms run and saved to data directory**")
   xbutton("Figure 8","{load_file(\"LGMD/LGMDsynchro.hoc\")}")
 
 // For realistic morphology simulations shown in figure 6:
