@@ -88,8 +88,9 @@ proc setsynloc() {
 
 g = new Graph(0)
 if (showGUI) {
-	graphList[0].append(g)
-	{g.view(0, -70, tstop, 70, 400, 400, 800, 350)}
+// 	gn = graphList[0].append(g)
+	{g.view(20, -70, 90, 30, 400, 400, 800, 350)}
+	g.label(0.65,0.9,"25 ms synaptic jitter")
 	g.addvar("v(0.5)",1,1)
 	g.begin()
 	g.family(1)
@@ -116,7 +117,6 @@ proc runsynchro() {local n	localobj fobj, gpasvec, lpasvec, gls
 // 	full model
 		gh=1
 		Zstate=0
-		g.color(4)
 		if (ii>1) {
 			n=0
 			forall {
@@ -126,7 +126,8 @@ proc runsynchro() {local n	localobj fobj, gpasvec, lpasvec, gls
 				n+=1
 			}
 		}
-		label = "full_model"
+		label = "full model"
+		g.color(1)
 		g.label(0.65,0.8,label)
 		runc()
 		
@@ -153,8 +154,8 @@ proc runsynchro() {local n	localobj fobj, gpasvec, lpasvec, gls
 		gh=3
 		addXE991("axon")
 		addZD7288()
-		g.color(1)
-		label = "ZD7288_XE991"
+		g.color(3)
+		label = "No gh No gM"
 		g.label(0.65,0.65,label)
 		runc()
 		washXE991("axon")
@@ -177,8 +178,8 @@ proc runsynchro() {local n	localobj fobj, gpasvec, lpasvec, gls
 		}
 		addXE991()
 		addZD7288()
-		g.color(5)
-		label = "Lpas2"
+		g.color(7)
+		label = "gh and gM replaced by gL"
 		g.label(0.65,0.6,label)
 		runc()
 		
@@ -195,8 +196,8 @@ proc runsynchro() {local n	localobj fobj, gpasvec, lpasvec, gls
 		
 		gh=4
 		Zstate=0
-		g.color(2)
-		label = "gpas"
+		g.color(4)
+		label = "gh and gM replaced by gleak"
 		g.label(0.65,0.7,label)
 		runc()
 		washXE991()
@@ -239,10 +240,20 @@ proc runc() { local n,i
 		}
 	}
 
+	
+	gn = graphList[0].append(g)
+	nfrac = 0.5
+	setsyntime()
+	run()
+	graphList[0].remove(gn-1)
+
 	for n=0,nfd {
 		nfrac = 1.0/nfd*n
 		setsyntime()
 		
+		if (nfrac==0.5) {
+			continue
+		}
 		run()
 	}
 	
