@@ -15,16 +15,16 @@ xpanel("Dewell & Gabbiani 2019 J Neurophysiol")
 
 // For realistic morphology simulations shown in figure 6:
   xlabel("** Compare Realistic Mophologies **")
-  xlabel("** Saves results to 'data' directory (be patient) **")
-  xbutton("PassiveMorphologies.hoc","{load_file(\"passive_morphologies.hoc\")}")
+  xlabel("** Saves results to 'data' directory (be patient takes 1 hr) **")
+  xbutton("passive_morphologies.hoc","{load_file(\"passive_morphologies.hoc\")}")
 
 // For simulations on simplified morphology models shown in figure 7:
   xlabel("** Simplified Morphologies **")
-  xlabel("** Saves results to 'data' directory **")
+  xlabel("** Saves results to 'data' directory (takes 5 minutes but requires PassiveMorphologies.hoc to be run first)**")
   xbutton("cable.hoc","{load_file(\"cable.hoc\")}")
   
 // For simulations resulting in figure S3:
-  xlabel("** Rall model **")
+  xlabel("** Rall model (takes 18 minutes) **")
   xbutton("Simulations for Figure S3", "{load_file(\"RallSynchro.hoc\")}")
 
   xlabel(" ")
