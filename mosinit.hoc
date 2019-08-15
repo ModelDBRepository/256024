@@ -20,7 +20,7 @@ xpanel("Dewell & Gabbiani 2019 J Neurophysiol")
 
 // For simulations on simplified morphology models shown in figure 7:
   xlabel("** Simplified Morphologies **")
-  xlabel("** Saves results to 'data' directory (takes 5 minutes but requires PassiveMorphologies.hoc to be run first)**")
+  xlabel("** Saves results to 'data' directory (takes 5 minutes) **")
   xbutton("cable.hoc","{load_file(\"cable.hoc\")}")
   
 // For simulations resulting in figure S3:
